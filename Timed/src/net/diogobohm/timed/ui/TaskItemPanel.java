@@ -4,18 +4,30 @@
 
 package net.diogobohm.timed.ui;
 
+import java.text.SimpleDateFormat;
+import java.util.logging.SimpleFormatter;
+import net.diogobohm.timed.domain.Task;
+import net.diogobohm.timed.ui.formatter.TaskTimeFormatter;
+
 /**
  *
  * @author diogo
  */
 public class TaskItemPanel extends javax.swing.JPanel {
 
+    private static final TaskTimeFormatter TIME_FORMATTER = new TaskTimeFormatter();
+
 	/**
 	 * Creates new form TaskItemPanel
 	 */
 	public TaskItemPanel() {
 		initComponents();
-	}
+    }
+
+    public void setTask(Task task) {
+        startTimeLabel.setText(TIME_FORMATTER.format(task.getStart()));
+        stopTimeLabel.setText(TIME_FORMATTER.format(task.getFinish()));
+    }
 
 	/**
 	 * This method is called from within the constructor to initialize the form. WARNING: Do NOT
@@ -25,34 +37,34 @@ public class TaskItemPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        startTimeLabel = new javax.swing.JLabel();
+        timeSplitLabel = new javax.swing.JLabel();
+        stopTimeLabel = new javax.swing.JLabel();
+        taskNameLabel = new javax.swing.JLabel();
+        tagListLabel = new javax.swing.JLabel();
+        editTaskButton = new javax.swing.JButton();
 
         setOpaque(false);
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jLabel1.setText("StartTime");
+        startTimeLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        startTimeLabel.setText("StartTime");
 
-        jLabel2.setText(":");
+        timeSplitLabel.setText(":");
 
-        jLabel3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jLabel3.setText("StopTime");
+        stopTimeLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        stopTimeLabel.setText("StopTime");
 
-        jLabel4.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jLabel4.setText("TaskName");
+        taskNameLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        taskNameLabel.setText("TaskName");
 
-        jLabel5.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jLabel5.setText("TagList");
+        tagListLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        tagListLabel.setText("TagList");
 
-        jButton1.setText("Edit");
-        jButton1.setOpaque(false);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        editTaskButton.setText("Edit");
+        editTaskButton.setOpaque(false);
+        editTaskButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                editTaskButtonActionPerformed(evt);
             }
         });
 
@@ -62,17 +74,17 @@ public class TaskItemPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(startTimeLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
+                .addComponent(timeSplitLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
+                .addComponent(stopTimeLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(taskNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                .addComponent(tagListLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(editTaskButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -80,27 +92,27 @@ public class TaskItemPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jButton1))
+                    .addComponent(startTimeLabel)
+                    .addComponent(timeSplitLabel)
+                    .addComponent(stopTimeLabel)
+                    .addComponent(taskNameLabel)
+                    .addComponent(tagListLabel)
+                    .addComponent(editTaskButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void editTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editTaskButtonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_editTaskButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JButton editTaskButton;
+    private javax.swing.JLabel startTimeLabel;
+    private javax.swing.JLabel stopTimeLabel;
+    private javax.swing.JLabel tagListLabel;
+    private javax.swing.JLabel taskNameLabel;
+    private javax.swing.JLabel timeSplitLabel;
     // End of variables declaration//GEN-END:variables
 }
