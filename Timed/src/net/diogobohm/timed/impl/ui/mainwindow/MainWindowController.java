@@ -58,10 +58,10 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
         Activity activity2 = new Activity("TA1235 - DoitallOnceAgain");
 
         Task task1 = new Task(new Date(), Optional.of(new Date()), activity1,
-                Sets.newHashSet(codingTag, testTag), project1);
+                Sets.newHashSet(codingTag, testTag), project1, "");
 
         Task task2 = new Task(new Date(), Optional.<Date>absent(), activity2,
-                Sets.newHashSet(codingTag), project2);
+                Sets.newHashSet(codingTag), project2, "");
 
         Dashboard dashboard = new Dashboard();
         dashboard.getTasks().add(task1);

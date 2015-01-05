@@ -20,13 +20,16 @@ public class Task implements LabeledBean {
     private final Activity activity;
     private final Set<Tag> tags;
     private final Project project;
+    private final String description;
 
-    public Task(Date start, Optional<Date> finish, Activity activity, Set<Tag> tags, Project project) {
+    public Task(Date start, Optional<Date> finish, Activity activity, Set<Tag> tags, Project project,
+            String description) {
         this.start = start;
         this.finish = finish;
         this.activity = activity;
         this.tags = tags;
         this.project = project;
+        this.description = description;
     }
 
     public Date getStart() {
@@ -47,6 +50,10 @@ public class Task implements LabeledBean {
 
     public Project getProject() {
         return project;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Override
