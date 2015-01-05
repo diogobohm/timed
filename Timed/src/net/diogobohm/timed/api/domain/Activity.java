@@ -11,11 +11,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author diogo
  */
-public class Project {
+public class Activity {
 
     private final String name;
 
-    public Project(String name) {
+    public Activity(String name) {
         this.name = name;
     }
 

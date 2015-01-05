@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import java.util.Date;
 import java.util.Set;
 import javax.swing.JFrame;
+import net.diogobohm.timed.api.domain.Activity;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Project;
@@ -53,11 +54,13 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
         Tag testTag = new Tag("Test");
         Project project1 = new Project("Project1");
         Project project2 = new Project("Project2");
+        Activity activity1 = new Activity("TA1234 - Doitall");
+        Activity activity2 = new Activity("TA1235 - DoitallOnceAgain");
 
-        Task task1 = new Task(new Date(), Optional.of(new Date()), "TA1235 - DoitallOnceAgain",
+        Task task1 = new Task(new Date(), Optional.of(new Date()), activity1,
                 Sets.newHashSet(codingTag, testTag), project1);
 
-        Task task2 = new Task(new Date(), Optional.<Date>absent(), "TA1234 - Doitall",
+        Task task2 = new Task(new Date(), Optional.<Date>absent(), activity2,
                 Sets.newHashSet(codingTag), project2);
 
         Dashboard dashboard = new Dashboard();

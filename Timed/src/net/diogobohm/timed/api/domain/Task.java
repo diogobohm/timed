@@ -17,14 +17,14 @@ public class Task implements LabeledBean {
 
     private final Date start;
     private final Optional<Date> finish;
-    private final String name;
+    private final Activity activity;
     private final Set<Tag> tags;
     private final Project project;
 
-    public Task(Date start, Optional<Date> finish, String name, Set<Tag> tags, Project project) {
+    public Task(Date start, Optional<Date> finish, Activity activity, Set<Tag> tags, Project project) {
         this.start = start;
         this.finish = finish;
-        this.name = name;
+        this.activity = activity;
         this.tags = tags;
         this.project = project;
     }
@@ -37,8 +37,8 @@ public class Task implements LabeledBean {
         return finish;
     }
 
-    public String getName() {
-        return name;
+    public Activity getActivity() {
+        return activity;
     }
 
     public Set<Tag> getTags() {
@@ -66,7 +66,7 @@ public class Task implements LabeledBean {
 
     @Override
     public String getLabel() {
-        return getName() + "@" + getProject().getName();
+        return getActivity().getName() + "@" + getProject().getName();
     }
 
 }
