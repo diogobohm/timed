@@ -4,7 +4,9 @@
 package net.diogobohm.timed.impl.ui.mainwindow;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.ArrayList;
 import java.util.List;
 import net.diogobohm.timed.api.ui.mvc.MVCModel;
 import net.diogobohm.timed.api.ui.mvc.model.DashboardTaskValueHolder;
@@ -13,7 +15,7 @@ import net.diogobohm.timed.api.ui.mvc.model.TagSetHolder;
 import net.diogobohm.timed.api.ui.mvc.model.ToStringValueHolder;
 import net.diogobohm.timed.api.ui.mvc.model.TypedValueHolder;
 import net.diogobohm.timed.api.ui.mvc.model.TypedValueModel;
-import net.diogobohm.timed.api.domain.Dashboard;
+import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Tag;
 import net.diogobohm.timed.api.domain.Task;
 
@@ -30,7 +32,9 @@ public class MainWindowModel implements MVCModel<Dashboard> {
     public MainWindowModel() {
         currentTaskTagsHolder = new TagSetHolder();
         currentTaskHolder = new DashboardTaskValueHolder();
-        taskListHolder = new TypedValueHolder<>();
+        taskListHolder = new TypedValueHolder<List<Task>>();
+
+        taskListHolder.setValue(new ArrayList<Task>());
     }
 
     public DashboardTaskValueHolder getCurrentTaskHolder() {

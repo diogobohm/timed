@@ -3,9 +3,21 @@
  */
 package net.diogobohm.timed.impl.hamster.migration;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.diogobohm.timed.api.domain.Activity;
 import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.domain.Tag;
@@ -22,54 +34,150 @@ import org.tmatesoft.sqljet.core.table.SqlJetDb;
  */
 public class HamsterMigration {
 
-    public void migrateHamsterDatabase(File hamsterDbFile, SqlJetDb database) throws SqlJetException {
+    private static final SimpleDateFormat SQLITE_DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd hh:mm");
+
+    public Collection<Task> migrateHamsterDatabase(File hamsterDbFile) throws SqlJetException {
         SqlJetDb hamsterDb = SqlJetDb.open(hamsterDbFile, false);
 
         hamsterDb.beginTransaction(SqlJetTransactionMode.READ_ONLY);
 
-        Map<Integer, String> activityMap = Maps.newHashMap();
-        Map<Integer, Activity> activities = loadActivities(hamsterDb);
-        Map<Integer, Tag> tags;
-        Map<Integer, Project> projects;
-        Map<Integer, Task> tasks;
+        Map<Integer, Tag> tags = loadTags(hamsterDb);
+        Multimap<Integer, Tag> taskTags = loadTaskTags(hamsterDb, tags);
+        Map<Integer, Project> projects = loadProjects(hamsterDb);
+        Map<Activity, Project> activityProjects = Maps.newHashMap();
+        Map<Integer, Activity> activities = loadActivities(hamsterDb, projects, activityProjects);
+        Map<Integer, Task> tasks = loadTasks(hamsterDb, activities, activityProjects, taskTags);
 
+        hamsterDb.close();
+
+        return tasks.values();
     }
 
-    private Map<Integer, Activity> loadActivities(SqlJetDb hamsterDb) throws SqlJetException {
+    private Map<Integer, Tag> loadTags(SqlJetDb hamsterDb) throws SqlJetException {
+        Map<Integer, Tag> tags = Maps.newHashMap();
+        ISqlJetTable tagsTable = hamsterDb.getTable("tags");
+        ISqlJetCursor tagsCursor = tagsTable.order(tagsTable.getPrimaryKeyIndexName());
+
+        if (!tagsCursor.eof()) {
+            do {
+                Integer id = fromLong(tagsCursor.getInteger("id"));
+                String name = tagsCursor.getString("name");
+
+                tags.put(id, new Tag(name));
+            } while (tagsCursor.next());
+        }
+
+        return tags;
+    }
+
+    private Multimap<Integer, Tag> loadTaskTags(SqlJetDb hamsterDb, Map<Integer, Tag> tags) throws SqlJetException {
+        Multimap<Integer, Tag> taskTagIndex = HashMultimap.create();
+        ISqlJetTable taskTagsTable = hamsterDb.getTable("fact_tags");
+        ISqlJetCursor taskTagsCursor = taskTagsTable.open();
+
+        if (!taskTagsCursor.eof()) {
+            do {
+                Integer taskId = fromLong(taskTagsCursor.getInteger("fact_id"));
+                Integer tagId = fromLong(taskTagsCursor.getInteger("tag_id"));
+
+                taskTagIndex.put(taskId, tags.get(tagId));
+            } while (taskTagsCursor.next());
+        }
+
+        return taskTagIndex;
+    }
+
+    private Map<Integer, Project> loadProjects(SqlJetDb hamsterDb) throws SqlJetException {
+        Map<Integer, Project> projects = Maps.newHashMap();
+        ISqlJetTable projectsTable = hamsterDb.getTable("categories");
+        ISqlJetCursor projectsCursor = projectsTable.order(projectsTable.getPrimaryKeyIndexName());
+
+        if (!projectsCursor.eof()) {
+            do {
+                Integer id = fromLong(projectsCursor.getInteger("id"));
+                String name = projectsCursor.getString("name");
+
+                projects.put(id, new Project(name));
+            } while (projectsCursor.next());
+        }
+
+        return projects;
+    }
+
+    private Map<Integer, Activity> loadActivities(SqlJetDb hamsterDb, Map<Integer, Project> projects,
+            Map<Activity, Project> activityProjects) throws SqlJetException {
         Map<Integer, Activity> activities = Maps.newHashMap();
         ISqlJetTable activitiesTable = hamsterDb.getTable("activities");
         ISqlJetCursor activitiesCursor = activitiesTable.order(activitiesTable.getPrimaryKeyIndexName());
+        Project undefinedProject = new Project("Undefined");
 
         if (!activitiesCursor.eof()) {
             do {
-                Integer id = fromLong(activitiesCursor.getInteger(activitiesTable.getPrimaryKeyIndexName()));
+                Integer id = fromLong(activitiesCursor.getInteger("id"));
                 String name = activitiesCursor.getString("name");
+                Integer projectId = fromLong(activitiesCursor.getInteger("category_id"));
+                Activity activity = new Activity(name);
 
-                activities.put(id, new Activity(name));
+                activities.put(id, activity);
+
+                if (projectId > 0) {
+                    activityProjects.put(activity, projects.get(projectId));
+                } else {
+                    activityProjects.put(activity, undefinedProject);
+                }
+
             } while (activitiesCursor.next());
         }
 
         return activities;
     }
 
-    private Map<Integer, Task> loadTasks(SqlJetDb hamsterDb, Map<Integer, Activity> activityMap) throws SqlJetException {
+    private Map<Integer, Task> loadTasks(SqlJetDb hamsterDb, Map<Integer, Activity> activityMap,
+            Map<Activity, Project> activityProjects, Multimap<Integer, Tag> taskTags) throws SqlJetException {
         Map<Integer, Task> tasks = Maps.newHashMap();
         ISqlJetTable tasksTable = hamsterDb.getTable("facts");
-        ISqlJetCursor activitiesCursor = tasksTable.order(tasksTable.getPrimaryKeyIndexName());
+        ISqlJetCursor tasksCursor = tasksTable.order(tasksTable.getPrimaryKeyIndexName());
 
-        if (!activitiesCursor.eof()) {
+        if (!tasksCursor.eof()) {
             do {
-                Integer id = fromLong(activitiesCursor.getInteger(tasksTable.getPrimaryKeyIndexName()));
-                String name = activitiesCursor.getString("name");
+                Integer activityId = fromLong(tasksCursor.getInteger("activity_id"));
+                Activity activity = activityMap.get(activityId);
 
-                tasks.put(id, new Task(name));
-            } while (activitiesCursor.next());
+                Integer id = fromLong(tasksCursor.getInteger("id"));
+                String description = tasksCursor.getString("description");
+                String start = tasksCursor.getString("start_time");
+                String end = tasksCursor.getString("end_time");
+
+                Date startTime = parseTime(start);
+                Optional<Date> endTime = Optional.absent();
+                if (end != null) {
+                    endTime = Optional.of(parseTime(end));
+                }
+
+                Set<Tag> tags = Sets.newHashSet();
+                if (taskTags.containsKey(id)) {
+                    tags.addAll(taskTags.get(id));
+                }
+
+                tasks.put(id, new Task(startTime, endTime, activity, tags, activityProjects.get(activity),
+                        description));
+            } while (tasksCursor.next());
         }
 
-        return Task;
+        return tasks;
     }
 
     private Integer fromLong(long number) {
         return Integer.valueOf(Long.valueOf(number).intValue());
+    }
+
+    private Date parseTime(String date) {
+        try {
+            return SQLITE_DATETIME_FORMATTER.parse(date);
+        } catch (ParseException ex) {
+            System.err.println("Error parsing date '" + date + "'.");
+        }
+
+        return null;
     }
 }
