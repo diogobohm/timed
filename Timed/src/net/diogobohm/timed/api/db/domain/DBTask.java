@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import java.util.Date;
 import java.util.Set;
 import net.diogobohm.timed.api.db.access.Database;
+import net.diogobohm.timed.api.db.access.configuration.DBObjectConfiguration;
 import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
 import net.diogobohm.timed.api.ui.mvc.model.bean.LabeledBean;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -15,9 +16,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author diogo
  */
-public class Task extends AbstractDatabaseObject {
+public class DBTask extends AbstractDatabaseObject {
 
-    private static final String TABLE_NAME = "task";
+    public static final DBObjectConfiguration CONFIGURATION = DBObjectConfiguration.TASK;
 
     private final String startDateTime;
     private final String finishDateTime;
@@ -25,23 +26,13 @@ public class Task extends AbstractDatabaseObject {
     private final Integer projectId;
     private final String description;
 
-    public Task(String startDateTime, String finishDateTime, Integer activityId, Integer projectId,
+    public DBTask(String startDateTime, String finishDateTime, Integer activityId, Integer projectId,
             String description) {
         this.startDateTime = startDateTime;
         this.finishDateTime = finishDateTime;
         this.activityId = activityId;
         this.projectId = projectId;
         this.description = description;
-    }
-
-    public static String getCreateTableQuery() {
-        return "CREATE TABLE " + TABLE_NAME + " ("
-                + " id INTEGER PRIMARY KEY, "
-                + " start_time DATETIME NOT NULL,"
-                + " end_time DATETIME,"
-                + " activity_id REFERENCES activity(id),"
-                + " project_id REFERENCES project(id),"
-                + " description TEXT);";
     }
 
     public String getStartDateTime() {
@@ -65,18 +56,13 @@ public class Task extends AbstractDatabaseObject {
     }
 
     @Override
-    public String getTableName() {
-        return TABLE_NAME;
+    public DBObjectConfiguration getConfiguration() {
+        return CONFIGURATION;
     }
 
     @Override
-    public Object[] getSerializedValues() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void load(Database database) throws DatabaseAccessException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Object getIndexValue() {
+        return getStartDateTime();
     }
 
     @Override

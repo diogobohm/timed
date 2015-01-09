@@ -1,25 +1,18 @@
 package net.diogobohm.timed.impl;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import java.io.File;
 import java.util.Collection;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFrame;
 import javax.swing.UIManager;
+import net.diogobohm.timed.api.db.access.Database;
 import net.diogobohm.timed.api.db.access.DatabaseConnection;
+import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
+import net.diogobohm.timed.api.db.serializer.DBPersistenceOrchestrator;
 import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.impl.hamster.migration.HamsterMigration;
-import net.diogobohm.timed.impl.ui.mainwindow.MainWindow;
 import net.diogobohm.timed.impl.ui.mainwindow.MainWindowController;
 import org.tmatesoft.sqljet.core.SqlJetException;
-import org.tmatesoft.sqljet.core.SqlJetTransactionMode;
-import org.tmatesoft.sqljet.core.table.ISqlJetCursor;
-import org.tmatesoft.sqljet.core.table.ISqlJetTable;
-import org.tmatesoft.sqljet.core.table.SqlJetDb;
 
 /**
  *
@@ -36,11 +29,30 @@ public class Main {
         } catch (Exception e) {
         }
 
-        DatabaseConnection.getConnection();
+        Database db = DatabaseConnection.getConnection();
+        DBPersistenceOrchestrator orchestrator = new DBPersistenceOrchestrator();
+        /*
+         Collection<Task> hamsterTasks = migrateDatabase();
+        
+        try {
+            for (Task task : hamsterTasks) {
+                orchestrator.writeTask(db, task);
+            }
+         */
+
+        Collection<Task> tasks = null;
+
+        try {
+            tasks = orchestrator.loadTasks(db);
+
+        } catch (DatabaseAccessException ex) {
+            System.err.println("Erro escrevendo!");
+            ex.printStackTrace();
+        }
 
         MainWindowController window = new MainWindowController();
 
-        //window.addTasks(migrateDatabase());
+        window.addTasks(tasks);
         window.showView();
     }
 

@@ -3,13 +3,17 @@
  */
 package net.diogobohm.timed.api.db.access;
 
+import com.google.common.collect.Lists;
 import java.io.File;
-import net.diogobohm.timed.api.db.domain.Activity;
-import net.diogobohm.timed.api.db.domain.Project;
-import net.diogobohm.timed.api.db.domain.Tag;
-import net.diogobohm.timed.api.db.domain.Task;
-import net.diogobohm.timed.api.db.domain.TaskTag;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.security.auth.login.Configuration;
+import net.diogobohm.timed.api.db.access.configuration.DBTableConfiguration;
+import net.diogobohm.timed.api.db.access.configuration.DBObjectConfiguration;
+import net.diogobohm.timed.api.db.domain.DBActivity;
 import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
+import net.diogobohm.timed.api.db.serializer.DBSerializer;
 import org.tmatesoft.sqljet.core.SqlJetException;
 import org.tmatesoft.sqljet.core.SqlJetTransactionMode;
 import org.tmatesoft.sqljet.core.schema.SqlJetConflictAction;
@@ -39,27 +43,55 @@ public class Database {
         }
     }
 
-    public Integer writeObject(DatabaseObject object) throws DatabaseAccessException {
+    public void write(DatabaseObject object) throws DatabaseAccessException {
+        DBObjectConfiguration configuration = object.getConfiguration();
+        DBTableConfiguration tableConfuration = configuration.getTableConfiguration();
+        DBSerializer serializer = configuration.getSerializer();
+
         startTransaction();
 
-        try {
-            ISqlJetTable table = getTable(object.getTableName());
-            long id = table.insertOr(SqlJetConflictAction.REPLACE, object.getSerializedValues());
+        ISqlJetTable table = getTable(tableConfuration.getTableName());
+        ISqlJetCursor cursor;
+        long id;
 
-            return Long.valueOf(id).intValue();
+        try {
+            cursor = table.lookup(tableConfuration.getIndexName(), object.getIndexValue());
         } catch (SqlJetException exception) {
-            throw new DatabaseAccessException(exception, "Error writing object at " + object.getTableName());
+            // Register does not exist, create
+            try {
+                id = table.insert(serializer.serialize(object));
+
+                object.setId(Long.valueOf(id).intValue());
+            } catch (SqlJetException insertException) {
+                throw new DatabaseAccessException(insertException,
+                        "Error writing object at " + tableConfuration.getTableName());
+            } finally {
+                closeTransaction();
+                return;
+            }
+        }
+
+        try {
+            id = cursor.getRowId();
+            cursor.update(serializer.serialize(object));
+            cursor.close();
+
+            object.setId(Long.valueOf(id).intValue());
+        } catch (SqlJetException exception) {
+            throw new DatabaseAccessException(exception, "Error updating object at " + tableConfuration.getTableName());
         } finally {
             closeTransaction();
         }
     }
 
-    public void removeObject(DatabaseObject object) throws DatabaseAccessException {
+    public void remove(DatabaseObject object) throws DatabaseAccessException {
+        DBObjectConfiguration configuration = object.getConfiguration();
+        DBTableConfiguration tableConfuration = configuration.getTableConfiguration();
         startTransaction();
 
         try {
-            ISqlJetTable table = getTable(object.getTableName());
-            ISqlJetCursor cursor = table.scope("id", new Object[]{object.getId()}, new Object[]{object.getId()});
+            ISqlJetTable table = getTable(tableConfuration.getTableName());
+            ISqlJetCursor cursor = table.lookup("id", object.getId());
 
             while (!cursor.eof()) {
                 cursor.delete();
@@ -67,10 +99,59 @@ public class Database {
 
             cursor.close();
         } catch (SqlJetException exception) {
-            throw new DatabaseAccessException(exception, "Error removing object at " + object.getTableName());
+            throw new DatabaseAccessException(exception, "Error removing object at " + tableConfuration.getTableName());
         } finally {
             closeTransaction();
         }
+    }
+
+    public void loadIdFromAttributes(DatabaseObject object) throws DatabaseAccessException {
+        DBObjectConfiguration configuration = object.getConfiguration();
+        DBTableConfiguration tableConfuration = configuration.getTableConfiguration();
+        startTransaction();
+
+        try {
+            ISqlJetTable table = getTable(tableConfuration.getTableName());
+            ISqlJetCursor cursor = table.lookup(tableConfuration.getIndexName(), object.getIndexValue());
+
+            if (cursor.eof()) {
+                throw new DatabaseAccessException(null, "Could not find object at " + tableConfuration.getTableName());
+            }
+            Integer id = Long.valueOf(cursor.getInteger("id")).intValue();
+            object.setId(id);
+
+            cursor.close();
+        } catch (SqlJetException exception) {
+            throw new DatabaseAccessException(exception, "Error selecting object at " + tableConfuration.getTableName());
+        } finally {
+            closeTransaction();
+        }
+    }
+
+    public <T extends DatabaseObject> List<T> loadObjects(DBObjectConfiguration configuration) throws DatabaseAccessException {
+        List<T> objects = Lists.newArrayList();
+        startTransaction();
+
+        DBSerializer<T> serializer = configuration.getSerializer();
+        ISqlJetTable table = getTable(configuration.getTableConfiguration().getTableName());
+
+        try {
+            ISqlJetCursor cursor = table.open();
+
+            if (!cursor.eof()) {
+                do {
+                    objects.add(serializer.deserialize(cursor.getRowValues()));
+                } while (cursor.next());
+            }
+
+            cursor.close();
+        } catch (SqlJetException exception) {
+            throw new DatabaseAccessException(exception, "Error selecting activities!");
+        } finally {
+            closeTransaction();
+        }
+
+        return objects;
     }
 
     private void initializeDatabase() {
@@ -121,10 +202,14 @@ public class Database {
     }
 
     private void createDatabase() throws SqlJetException {
-        connection.createTable(Activity.getCreateTableQuery());
-        connection.createTable(Project.getCreateTableQuery());
-        connection.createTable(Tag.getCreateTableQuery());
-        connection.createTable(Task.getCreateTableQuery());
-        connection.createTable(TaskTag.getCreateTableQuery());
+        createTable(DBObjectConfiguration.ACTIVITY);
+        createTable(DBObjectConfiguration.PROJECT);
+        createTable(DBObjectConfiguration.TAG);
+        createTable(DBObjectConfiguration.TASK);
+        createTable(DBObjectConfiguration.TASK_TAG);
+    }
+
+    private void createTable(DBObjectConfiguration objectConfiguration) throws SqlJetException {
+        connection.createTable(objectConfiguration.getTableConfiguration().getCreateTableQuery());
     }
 }

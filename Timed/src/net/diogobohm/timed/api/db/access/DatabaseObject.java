@@ -3,7 +3,7 @@
  */
 package net.diogobohm.timed.api.db.access;
 
-import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
+import net.diogobohm.timed.api.db.access.configuration.DBObjectConfiguration;
 
 /**
  *
@@ -13,13 +13,9 @@ public interface DatabaseObject {
 
     Integer getId();
 
-    String getTableName();
+    void setId(Integer id);
 
-    Object[] getSerializedValues();
+    DBObjectConfiguration getConfiguration();
 
-    void write(Database database) throws DatabaseAccessException;
-
-    void load(Database database) throws DatabaseAccessException;
-
-    void remove(Database database) throws DatabaseAccessException;
+    Object getIndexValue();
 }
