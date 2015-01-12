@@ -6,17 +6,13 @@ package net.diogobohm.timed.api.db.access;
 import com.google.common.collect.Lists;
 import java.io.File;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.security.auth.login.Configuration;
+import java.util.Map;
 import net.diogobohm.timed.api.db.access.configuration.DBTableConfiguration;
 import net.diogobohm.timed.api.db.access.configuration.DBObjectConfiguration;
-import net.diogobohm.timed.api.db.domain.DBActivity;
 import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
 import net.diogobohm.timed.api.db.serializer.DBSerializer;
 import org.tmatesoft.sqljet.core.SqlJetException;
 import org.tmatesoft.sqljet.core.SqlJetTransactionMode;
-import org.tmatesoft.sqljet.core.schema.SqlJetConflictAction;
 import org.tmatesoft.sqljet.core.table.ISqlJetCursor;
 import org.tmatesoft.sqljet.core.table.ISqlJetTable;
 import org.tmatesoft.sqljet.core.table.SqlJetDb;
@@ -35,14 +31,6 @@ public class Database {
         initializeDatabase();
     }
 
-    public void createTable(String query) throws DatabaseAccessException {
-        try {
-            connection.createTable(query);
-        } catch (SqlJetException exception) {
-            throw new DatabaseAccessException(exception, "Error creating table!");
-        }
-    }
-
     public void write(DatabaseObject object) throws DatabaseAccessException {
         DBObjectConfiguration configuration = object.getConfiguration();
         DBTableConfiguration tableConfuration = configuration.getTableConfiguration();
@@ -51,37 +39,44 @@ public class Database {
         startTransaction();
 
         ISqlJetTable table = getTable(tableConfuration.getTableName());
-        ISqlJetCursor cursor;
-        long id;
+        ISqlJetCursor cursor = null;
+
+        String indexName = tableConfuration.getIndexName();
+        Object indexValue = object.getIndexValue();
 
         try {
-            cursor = table.lookup(tableConfuration.getIndexName(), object.getIndexValue());
+            cursor = table.lookup(indexName, indexValue);
         } catch (SqlJetException exception) {
-            // Register does not exist, create
-            try {
-                id = table.insert(serializer.serialize(object));
-
-                object.setId(Long.valueOf(id).intValue());
-            } catch (SqlJetException insertException) {
-                throw new DatabaseAccessException(insertException,
-                        "Error writing object at " + tableConfuration.getTableName());
-            } finally {
-                closeTransaction();
-                return;
-            }
+            closeTransaction();
+            throw new DatabaseAccessException(exception,
+                    "Error on object lookup at " + tableConfuration.getTableName());
         }
 
-        try {
-            id = cursor.getRowId();
-            cursor.update(serializer.serialize(object));
-            cursor.close();
+        Integer id;
 
-            object.setId(Long.valueOf(id).intValue());
-        } catch (SqlJetException exception) {
-            throw new DatabaseAccessException(exception, "Error updating object at " + tableConfuration.getTableName());
+        try {
+            if (cursor.eof()) {
+                // Register does not exist, create
+                id = insertRecord(table, serializer.serialize(object));
+            } else {
+                object.setId(Long.valueOf(cursor.getRowId()).intValue());
+                if (!object.equals(serializer.deserialize(cursor.getRowValues()))) {
+                    id = updateRecord(cursor, serializer.serialize(object));
+                    System.out.println("Updating " + object);
+                } else {
+                    id = Long.valueOf(cursor.getRowId()).intValue();
+                }
+            }
+
+            cursor.close();
+        } catch (SqlJetException insertException) {
+            throw new DatabaseAccessException(insertException,
+                    "Error writing object at " + tableConfuration.getTableName());
         } finally {
             closeTransaction();
         }
+
+        object.setId(id);
     }
 
     public void remove(DatabaseObject object) throws DatabaseAccessException {
@@ -169,8 +164,7 @@ public class Database {
         if (!databaseExists) {
             try {
                 createDatabase();
-            } catch (SqlJetException exception) {
-                System.err.println("Error creating database!");
+            } catch (DatabaseAccessException exception) {
                 exception.printStackTrace();
                 System.exit(1);
             }
@@ -193,6 +187,31 @@ public class Database {
         }
     }
 
+    private Integer insertRecord(ISqlJetTable table, Map<String, Object> serializedObject) throws DatabaseAccessException {
+        long id = 0;
+
+        try {
+            id = table.insertByFieldNames(serializedObject);
+        } catch (SqlJetException insertException) {
+            throw new DatabaseAccessException(insertException, "Error inserting object!");
+        }
+
+        return Long.valueOf(id).intValue();
+    }
+
+    private Integer updateRecord(ISqlJetCursor cursor, Map<String, Object> serializedObject) throws DatabaseAccessException {
+        long id = 0;
+
+        try {
+            id = cursor.getRowId();
+            cursor.updateByFieldNames(serializedObject);
+        } catch (SqlJetException insertException) {
+            throw new DatabaseAccessException(insertException, "Error updating object!");
+        }
+
+        return Long.valueOf(id).intValue();
+    }
+
     private ISqlJetTable getTable(String tableName) throws DatabaseAccessException {
         try {
             return connection.getTable(tableName);
@@ -201,15 +220,28 @@ public class Database {
         }
     }
 
-    private void createDatabase() throws SqlJetException {
-        createTable(DBObjectConfiguration.ACTIVITY);
-        createTable(DBObjectConfiguration.PROJECT);
-        createTable(DBObjectConfiguration.TAG);
-        createTable(DBObjectConfiguration.TASK);
-        createTable(DBObjectConfiguration.TASK_TAG);
+    private void createDatabase() throws DatabaseAccessException {
+        createTableAndIndex(DBObjectConfiguration.ACTIVITY);
+        createTableAndIndex(DBObjectConfiguration.PROJECT);
+        createTableAndIndex(DBObjectConfiguration.TAG);
+        createTableAndIndex(DBObjectConfiguration.TASK);
+        createTableAndIndex(DBObjectConfiguration.TASK_TAG);
     }
 
-    private void createTable(DBObjectConfiguration objectConfiguration) throws SqlJetException {
-        connection.createTable(objectConfiguration.getTableConfiguration().getCreateTableQuery());
+    private void createTableAndIndex(DBObjectConfiguration configuration) throws DatabaseAccessException {
+        DBTableConfiguration tableConfiguration = configuration.getTableConfiguration();
+
+        try {
+            connection.createTable(tableConfiguration.getCreateTableQuery());
+        } catch (SqlJetException exception) {
+            throw new DatabaseAccessException(exception, "Error creating table!");
+        }
+
+        try {
+            connection.createIndex(tableConfiguration.getCreateIndexQuery());
+        } catch (SqlJetException exception) {
+            throw new DatabaseAccessException(exception, "Error creating index!");
+        }
     }
+
 }

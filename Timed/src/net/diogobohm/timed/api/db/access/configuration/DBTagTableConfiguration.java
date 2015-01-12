@@ -10,10 +10,16 @@ package net.diogobohm.timed.api.db.access.configuration;
 public class DBTagTableConfiguration implements DBTableConfiguration {
 
     private static final String TABLE_NAME = "tag";
+    private static final String INDEX_NAME = "tag_name";
 
     @Override
     public String getTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public String getIndexName() {
+        return INDEX_NAME;
     }
 
     @Override
@@ -24,8 +30,8 @@ public class DBTagTableConfiguration implements DBTableConfiguration {
     }
 
     @Override
-    public String getIndexName() {
-        return "name";
+    public String getCreateIndexQuery() {
+        return "CREATE INDEX " + getIndexName() + " ON " + getTableName() + "(name);";
     }
 
 }

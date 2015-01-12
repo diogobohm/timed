@@ -11,13 +11,10 @@ import com.google.common.collect.Sets;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.diogobohm.timed.api.domain.Activity;
 import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.domain.Tag;
@@ -35,7 +32,8 @@ import org.tmatesoft.sqljet.core.table.SqlJetDb;
 public class HamsterMigration {
 
     private static final SimpleDateFormat SQLITE_DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd hh:mm");
-
+    private static final Project UNDEFINED_PROJECT = new Project("Undefined");
+    
     public Collection<Task> migrateHamsterDatabase(File hamsterDbFile) throws SqlJetException {
         SqlJetDb hamsterDb = SqlJetDb.open(hamsterDbFile, false);
 
@@ -109,8 +107,7 @@ public class HamsterMigration {
         Map<Integer, Activity> activities = Maps.newHashMap();
         ISqlJetTable activitiesTable = hamsterDb.getTable("activities");
         ISqlJetCursor activitiesCursor = activitiesTable.order(activitiesTable.getPrimaryKeyIndexName());
-        Project undefinedProject = new Project("Undefined");
-
+        
         if (!activitiesCursor.eof()) {
             do {
                 Integer id = fromLong(activitiesCursor.getInteger("id"));
@@ -123,7 +120,7 @@ public class HamsterMigration {
                 if (projectId > 0) {
                     activityProjects.put(activity, projects.get(projectId));
                 } else {
-                    activityProjects.put(activity, undefinedProject);
+                    activityProjects.put(activity, UNDEFINED_PROJECT);
                 }
 
             } while (activitiesCursor.next());
@@ -142,6 +139,7 @@ public class HamsterMigration {
             do {
                 Integer activityId = fromLong(tasksCursor.getInteger("activity_id"));
                 Activity activity = activityMap.get(activityId);
+                Project project = activityProjects.get(activity);
 
                 Integer id = fromLong(tasksCursor.getInteger("id"));
                 String description = tasksCursor.getString("description");
@@ -159,8 +157,7 @@ public class HamsterMigration {
                     tags.addAll(taskTags.get(id));
                 }
 
-                tasks.put(id, new Task(startTime, endTime, activity, tags, activityProjects.get(activity),
-                        description));
+                tasks.put(id, new Task(activity, project, startTime, endTime, description, tags));
             } while (tasksCursor.next());
         }
 

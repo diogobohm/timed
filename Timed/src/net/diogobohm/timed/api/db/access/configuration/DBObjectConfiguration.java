@@ -3,7 +3,6 @@
  */
 package net.diogobohm.timed.api.db.access.configuration;
 
-import net.diogobohm.timed.api.db.access.DatabaseObject;
 import net.diogobohm.timed.api.db.domain.DBActivity;
 import net.diogobohm.timed.api.db.serializer.DBActivitySerializer;
 import net.diogobohm.timed.api.db.serializer.DBProjectSerializer;

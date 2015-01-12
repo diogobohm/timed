@@ -31,23 +31,28 @@ public class Main {
 
         Database db = DatabaseConnection.getConnection();
         DBPersistenceOrchestrator orchestrator = new DBPersistenceOrchestrator();
-        /*
-         Collection<Task> hamsterTasks = migrateDatabase();
         
+        Collection<Task> hamsterTasks = migrateDatabase();
+
         try {
             for (Task task : hamsterTasks) {
                 orchestrator.writeTask(db, task);
             }
-         */
+        } catch (DatabaseAccessException ex) {
+            System.err.println("Error migrating hamster database!");
+            ex.printStackTrace();
+            System.exit(1);
+        }
 
-        Collection<Task> tasks = null;
+        Collection<Task> tasks = Lists.newArrayList();
 
         try {
-            tasks = orchestrator.loadTasks(db);
+            tasks.addAll(orchestrator.loadTasks(db));
 
         } catch (DatabaseAccessException ex) {
-            System.err.println("Erro escrevendo!");
+            System.err.println("Error loading tasks!");
             ex.printStackTrace();
+            System.exit(1);
         }
 
         MainWindowController window = new MainWindowController();

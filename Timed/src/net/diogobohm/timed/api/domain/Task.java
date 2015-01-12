@@ -15,15 +15,15 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class Task implements LabeledBean {
 
+    private final Activity activity;
+    private final Project project;
     private final Date start;
     private final Optional<Date> finish;
-    private final Activity activity;
-    private final Set<Tag> tags;
-    private final Project project;
     private final String description;
-
-    public Task(Date start, Optional<Date> finish, Activity activity, Set<Tag> tags, Project project,
-            String description) {
+    private final Set<Tag> tags;
+    
+    public Task(Activity activity, Project project, Date start, Optional<Date> finish, String description,
+            Set<Tag> tags) {
         this.start = start;
         this.finish = finish;
         this.activity = activity;

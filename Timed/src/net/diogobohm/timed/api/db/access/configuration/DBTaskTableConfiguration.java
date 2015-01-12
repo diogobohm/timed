@@ -10,6 +10,7 @@ package net.diogobohm.timed.api.db.access.configuration;
 public class DBTaskTableConfiguration implements DBTableConfiguration {
 
     private static final String TABLE_NAME = "task";
+    private static final String INDEX_NAME = "task_start_time";
 
     @Override
     public String getTableName() {
@@ -17,19 +18,24 @@ public class DBTaskTableConfiguration implements DBTableConfiguration {
     }
 
     @Override
+    public String getIndexName() {
+        return INDEX_NAME;
+    }
+
+    @Override
     public String getCreateTableQuery() {
         return "CREATE TABLE " + getTableName() + " ("
-                + " id INTEGER PRIMARY KEY, "
-                + " start_time DATETIME NOT NULL,"
-                + " end_time DATETIME,"
-                + " activity_id REFERENCES activity(id),"
-                + " project_id REFERENCES project(id),"
+                + " id INTEGER PRIMARY KEY,"
+                + " activity_id REFERENCES activity(id) NOT NULL,"
+                + " project_id REFERENCES project(id) NOT NULL,"
+                + " start_time TIMESTAMP NOT NULL,"
+                + " end_time TIMESTAMP,"
                 + " description TEXT);";
     }
 
     @Override
-    public String getIndexName() {
-        return "start_time";
+    public String getCreateIndexQuery() {
+        return "CREATE INDEX " + getIndexName() + " ON " + getTableName() + "(start_time);";
     }
 
 }

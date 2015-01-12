@@ -3,6 +3,7 @@
  */
 package net.diogobohm.timed.api.db.serializer;
 
+import java.util.Map;
 import net.diogobohm.timed.api.db.access.DatabaseObject;
 
 /**
@@ -13,5 +14,5 @@ public interface DBSerializer<T extends DatabaseObject> {
 
     T deserialize(Object[] data);
 
-    Object[] serialize(T object);
+    Map<String, Object> serialize(T object);
 }

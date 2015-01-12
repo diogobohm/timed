@@ -3,6 +3,8 @@
  */
 package net.diogobohm.timed.api.db.serializer;
 
+import com.google.common.collect.Maps;
+import java.util.Map;
 import net.diogobohm.timed.api.db.domain.DBTaskTag;
 
 /**
@@ -30,8 +32,13 @@ public class DBTaskTagSerializer implements DBSerializer<DBTaskTag> {
     }
 
     @Override
-    public Object[] serialize(DBTaskTag object) {
-        return new Object[]{object.getTaskId(), object.getTagId()};
+    public Map<String, Object> serialize(DBTaskTag object) {
+        Map<String, Object> valueMap = Maps.newHashMap();
+
+        valueMap.put("task_id", object.getTaskId());
+        valueMap.put("tag_id", object.getTagId());
+
+        return valueMap;
     }
 
 }

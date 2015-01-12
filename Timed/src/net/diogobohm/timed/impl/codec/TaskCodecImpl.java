@@ -8,11 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
-import net.diogobohm.timed.api.codec.ActivityCodec;
-import net.diogobohm.timed.api.codec.ProjectCodec;
 import net.diogobohm.timed.api.codec.TaskCodec;
-import net.diogobohm.timed.api.db.domain.DBActivity;
-import net.diogobohm.timed.api.db.domain.DBProject;
 import net.diogobohm.timed.api.db.domain.DBTask;
 import net.diogobohm.timed.api.domain.Activity;
 import net.diogobohm.timed.api.domain.Project;
@@ -25,24 +21,26 @@ import net.diogobohm.timed.api.domain.Task;
  */
 public class TaskCodecImpl implements TaskCodec {
 
-    private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("EEE MMM dd hh:mm:ss z YYYY");
+    private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd hh:mm");
 
     @Override
     public DBTask encode(Task task, Integer activityId, Integer projectId) {
-        String start = task.getStart().toString();
+        String start = DATETIME_FORMATTER.format(task.getStart());
         String end = null;
+        String description = task.getDescription();
 
         if (task.getFinish().isPresent()) {
-            end = task.getFinish().get().toString();
+            end = DATETIME_FORMATTER.format(task.getFinish().get());
         }
 
-        return new DBTask(start, end, activityId, projectId, task.getDescription());
+        return new DBTask(activityId, projectId, start, end, description);
     }
 
     @Override
     public Task decode(DBTask task, Activity activity, Project project, Set<Tag> tags) {
         Date start = null;
         Optional<Date> end = Optional.absent();
+        String description = task.getDescription();
 
         try {
             start = DATETIME_FORMATTER.parse(task.getStartDateTime());
@@ -53,7 +51,7 @@ public class TaskCodecImpl implements TaskCodec {
             ex.printStackTrace();
         }
 
-        return new Task(start, end, activity, tags, project, task.getDescription());
+        return new Task(activity, project, start, end, description, tags);
     }
 
 }

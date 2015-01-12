@@ -3,6 +3,8 @@
  */
 package net.diogobohm.timed.api.db.serializer;
 
+import com.google.common.collect.Maps;
+import java.util.Map;
 import net.diogobohm.timed.api.db.domain.DBTag;
 
 /**
@@ -23,8 +25,12 @@ public class DBTagSerializer implements DBSerializer<DBTag> {
     }
 
     @Override
-    public Object[] serialize(DBTag object) {
-        return new Object[]{object.getName()};
+    public Map<String, Object> serialize(DBTag object) {
+        Map<String, Object> valueMap = Maps.newHashMap();
+
+        valueMap.put("name", object.getName());
+
+        return valueMap;
     }
 
 }

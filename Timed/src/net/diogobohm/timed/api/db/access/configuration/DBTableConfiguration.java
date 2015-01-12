@@ -11,7 +11,10 @@ public interface DBTableConfiguration {
 
     String getTableName();
 
+    String getIndexName();
+
     String getCreateTableQuery();
 
-    String getIndexName();
+    String getCreateIndexQuery();
+
 }

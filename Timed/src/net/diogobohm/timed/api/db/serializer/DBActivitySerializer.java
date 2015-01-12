@@ -3,6 +3,9 @@
  */
 package net.diogobohm.timed.api.db.serializer;
 
+import com.google.common.collect.Maps;
+import java.util.HashMap;
+import java.util.Map;
 import net.diogobohm.timed.api.db.domain.DBActivity;
 
 /**
@@ -23,8 +26,12 @@ public class DBActivitySerializer implements DBSerializer<DBActivity> {
     }
 
     @Override
-    public Object[] serialize(DBActivity object) {
-        return new Object[]{object.getName()};
+    public Map<String, Object> serialize(DBActivity object) {
+        Map<String, Object> valueMap = Maps.newHashMap();
+
+        valueMap.put("name", object.getName());
+
+        return valueMap;
     }
 
 }

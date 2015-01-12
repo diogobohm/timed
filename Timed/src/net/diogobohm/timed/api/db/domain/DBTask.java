@@ -1,12 +1,6 @@
 package net.diogobohm.timed.api.db.domain;
 
-import com.google.common.base.Optional;
-import java.util.Date;
-import java.util.Set;
-import net.diogobohm.timed.api.db.access.Database;
 import net.diogobohm.timed.api.db.access.configuration.DBObjectConfiguration;
-import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
-import net.diogobohm.timed.api.ui.mvc.model.bean.LabeledBean;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -20,13 +14,13 @@ public class DBTask extends AbstractDatabaseObject {
 
     public static final DBObjectConfiguration CONFIGURATION = DBObjectConfiguration.TASK;
 
-    private final String startDateTime;
-    private final String finishDateTime;
     private final Integer activityId;
     private final Integer projectId;
+    private final String startDateTime;
+    private final String finishDateTime;
     private final String description;
 
-    public DBTask(String startDateTime, String finishDateTime, Integer activityId, Integer projectId,
+    public DBTask(Integer activityId, Integer projectId, String startDateTime, String finishDateTime,
             String description) {
         this.startDateTime = startDateTime;
         this.finishDateTime = finishDateTime;
