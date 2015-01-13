@@ -9,7 +9,7 @@ import net.diogobohm.timed.api.ui.mvc.model.bean.LabeledBean;
  *
  * @author diogo.bohm
  */
-public class LabeledBeanHolder extends AbstractTypedValueModel<LabeledBean> {
+public class LabeledBeanHolder<T extends LabeledBean> extends AbstractTypedValueModel<T> {
 
     @Override
     public String buildRenderedView() {

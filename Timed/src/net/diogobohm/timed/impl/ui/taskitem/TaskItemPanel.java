@@ -3,7 +3,6 @@
  */
 package net.diogobohm.timed.impl.ui.taskitem;
 
-import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.binding.adapter.Bindings;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 import net.diogobohm.timed.api.ui.mvc.model.formatter.TaskTimeFormatter;
@@ -43,6 +42,11 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
         editTaskButton = new javax.swing.JButton();
 
         setOpaque(false);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
 
         startTimeLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         startTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -69,11 +73,7 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
 
         editTaskButton.setText("Edit");
         editTaskButton.setOpaque(false);
-        editTaskButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editTaskButtonActionPerformed(evt);
-            }
-        });
+        editTaskButton.addActionListener(model.getEditTaskAction());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -108,9 +108,9 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void editTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editTaskButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_editTaskButtonActionPerformed
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+        editTaskButton.doClick();
+    }//GEN-LAST:event_formMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

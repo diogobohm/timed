@@ -33,7 +33,7 @@ public class Main {
         }
 
         Database db = DatabaseConnection.getConnection();
-        DBPersistenceOrchestrator orchestrator = new DBPersistenceOrchestrator();
+        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
 
         Collection<Task> hamsterTasks = migrateDatabase();
 
@@ -48,7 +48,7 @@ public class Main {
         Collection<Task> tasks = Lists.newArrayList();
 
         try {
-            tasks.addAll(orchestrator.loadTasks(db));
+            tasks.addAll(orchestrator.loadTasks(db, "2011-10-01 00:00", "2011-10-29 23:59"));
 
         } catch (DatabaseAccessException ex) {
             System.err.println("Error loading tasks!");
@@ -58,7 +58,7 @@ public class Main {
 
         MainWindowController window = new MainWindowController();
 
-        window.addTasks(tasks);
+        window.addTodaysTasks();
         window.showView();
     }
 

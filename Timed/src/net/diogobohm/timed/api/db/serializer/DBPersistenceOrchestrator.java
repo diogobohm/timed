@@ -41,12 +41,26 @@ import org.eclipse.persistence.platform.database.DB2MainframePlatform;
  */
 public class DBPersistenceOrchestrator {
 
+    private static DBPersistenceOrchestrator INSTANCE;
+
     private final ActivityCodec activityCodec;
     private final ProjectCodec projectCodec;
     private final TagCodec tagCodec;
     private final TaskCodec taskCodec;
 
-    public DBPersistenceOrchestrator() {
+    public static DBPersistenceOrchestrator getInstance() {
+        if (INSTANCE == null) {
+            synchronized (DBPersistenceOrchestrator.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new DBPersistenceOrchestrator();
+                }
+            }
+        }
+
+        return INSTANCE;
+    }
+
+    private DBPersistenceOrchestrator() {
         this.activityCodec = new ActivityCodecImpl();
         this.projectCodec = new ProjectCodecImpl();
         this.tagCodec = new TagCodecImpl();
@@ -59,6 +73,28 @@ public class DBPersistenceOrchestrator {
         Multimap<Integer, Tag> tagIndex = loadTagIndex(database);
         List<Task> tasks = Lists.newArrayList();
         List<DBTask> dbTasks = loadObjects(database, DBObjectConfiguration.TASK);
+
+        for (DBTask task : dbTasks) {
+            Activity activity = activities.get(task.getActivityId());
+            Project project = projects.get(task.getProjectId());
+            Set<Tag> tags = Sets.newHashSet(tagIndex.get(task.getId()));
+
+            tasks.add(taskCodec.decode(task, activity, project, tags));
+        }
+
+        return tasks;
+    }
+
+    public List<Task> loadTasks(Database database, String startDate, String endDate) throws DatabaseAccessException {
+        Map<Integer, Activity> activities = loadActivityIndex(database);
+        Map<Integer, Project> projects = loadProjectIndex(database);
+        Multimap<Integer, Tag> tagIndex = loadTagIndex(database);
+        List<Task> tasks = Lists.newArrayList();
+        List<DBTask> dbTasks;
+
+        database.startTransaction();
+        dbTasks = database.loadTasksOnDateInterval(startDate, endDate);
+        database.closeTransaction();
 
         for (DBTask task : dbTasks) {
             Activity activity = activities.get(task.getActivityId());

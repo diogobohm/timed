@@ -3,6 +3,7 @@
  */
 package net.diogobohm.timed.api.domain;
 
+import net.diogobohm.timed.api.ui.mvc.model.bean.LabeledBean;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -11,7 +12,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author diogo
  */
-public class Project {
+public class Project implements LabeledBean {
 
     private final String name;
 
@@ -36,5 +37,10 @@ public class Project {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
+    }
+
+    @Override
+    public String getLabel() {
+        return getName();
     }
 }

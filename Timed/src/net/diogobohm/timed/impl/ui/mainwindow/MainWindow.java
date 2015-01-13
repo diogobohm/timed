@@ -4,19 +4,10 @@
 
 package net.diogobohm.timed.impl.ui.mainwindow;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
-import com.jgoodies.binding.adapter.BasicComponentFactory;
 import com.jgoodies.binding.adapter.Bindings;
-import java.util.Date;
-import java.util.Set;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 import net.diogobohm.timed.api.ui.mvc.model.TaskListModel;
 import net.diogobohm.timed.api.ui.mvc.model.renderer.TaskListCellRenderer;
-import net.diogobohm.timed.api.domain.Project;
-import net.diogobohm.timed.api.domain.Tag;
-import net.diogobohm.timed.api.domain.Task;
-import net.diogobohm.timed.impl.ui.taskitem.TaskItemController;
 
 /**
  *
@@ -100,6 +91,7 @@ public class MainWindow extends javax.swing.JFrame implements MVCView {
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
+        taskList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         taskList.setModel(new TaskListModel(model.getTaskListHolder()));
         taskList.setCellRenderer(new TaskListCellRenderer());
         jScrollPane2.setViewportView(taskList);

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import net.diogobohm.timed.api.db.access.configuration.DBTableConfiguration;
 import net.diogobohm.timed.api.db.access.configuration.DBObjectConfiguration;
+import net.diogobohm.timed.api.db.domain.DBTask;
 import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
 import net.diogobohm.timed.api.db.serializer.DBSerializer;
 import org.tmatesoft.sqljet.core.SqlJetException;
@@ -37,10 +38,11 @@ public class Database {
         DBSerializer serializer = configuration.getSerializer();
 
         ISqlJetTable table = getTable(tableConfuration.getTableName());
-        ISqlJetCursor cursor = null;
-
         String indexName = tableConfuration.getIndexName();
         Object indexValue = object.getIndexValue();
+
+        ISqlJetCursor cursor = null;
+        Integer id;
 
         try {
             cursor = table.lookup(indexName, indexValue);
@@ -49,21 +51,18 @@ public class Database {
                     "Error on object lookup at " + tableConfuration.getTableName());
         }
 
-        Integer id;
-
         try {
             if (cursor.eof()) {
                 // Register does not exist, create
                 id = insertRecord(table, serializer.serialize(object));
+                object.setId(id);
             } else {
-                object.setId(Long.valueOf(cursor.getRowId()).intValue());
+                id = Long.valueOf(cursor.getRowId()).intValue();
                 DatabaseObject currObject = serializer.deserialize(cursor.getRowValues());
-                
+
+                object.setId(id);
                 if (!currObject.equals(object)) {
-                    id = updateRecord(cursor, serializer.serialize(object));
-                    System.out.println("Updating " + currObject + " to " + object);
-                } else {
-                    id = Long.valueOf(cursor.getRowId()).intValue();
+                    updateRecord(cursor, serializer.serialize(object));
                 }
             }
 
@@ -72,8 +71,6 @@ public class Database {
             throw new DatabaseAccessException(insertException,
                     "Error writing object at " + tableConfuration.getTableName());
         }
-
-        object.setId(id);
     }
 
     public void remove(DatabaseObject object) throws DatabaseAccessException {
@@ -118,7 +115,9 @@ public class Database {
         List<T> objects = Lists.newArrayList();
 
         DBSerializer<T> serializer = configuration.getSerializer();
-        ISqlJetTable table = getTable(configuration.getTableConfiguration().getTableName());
+        String tableName = configuration.getTableConfiguration().getTableName();
+
+        ISqlJetTable table = getTable(tableName);
 
         try {
             ISqlJetCursor cursor = table.open();
@@ -131,10 +130,34 @@ public class Database {
 
             cursor.close();
         } catch (SqlJetException exception) {
-            throw new DatabaseAccessException(exception, "Error selecting activities!");
+            throw new DatabaseAccessException(exception, "Error selecting objects from " + tableName + "!");
         }
 
         return objects;
+    }
+
+    public List<DBTask> loadTasksOnDateInterval(String startDate, String endDate) throws DatabaseAccessException {
+        DBObjectConfiguration configuration = DBObjectConfiguration.TASK;
+        DBTableConfiguration tableConfiguration = configuration.getTableConfiguration();
+        DBSerializer<DBTask> serializer = configuration.getSerializer();
+        ISqlJetTable table = getTable(tableConfiguration.getTableName());
+        List<DBTask> tasks = Lists.newArrayList();
+
+        try {
+            ISqlJetCursor cursor = table.scope(tableConfiguration.getIndexName(), new Object[]{startDate}, new Object[]{endDate});
+            
+            if (!cursor.eof()) {
+                do {
+                    tasks.add(serializer.deserialize(cursor.getRowValues()));
+                } while (cursor.next());
+            }
+
+            cursor.close();
+        } catch (SqlJetException exception) {
+            throw new DatabaseAccessException(exception, "Error selecting tasks between " + startDate + " and " + endDate + "!");
+        }
+
+        return tasks;
     }
 
     private void initializeDatabase() {

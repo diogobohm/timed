@@ -4,6 +4,7 @@
 package net.diogobohm.timed.impl.ui.taskitem;
 
 import com.google.common.base.Optional;
+import java.awt.event.ActionListener;
 import net.diogobohm.timed.api.ui.mvc.MVCModel;
 import net.diogobohm.timed.api.ui.mvc.model.LabeledBeanHolder;
 import net.diogobohm.timed.api.ui.mvc.model.TagSetHolder;
@@ -19,10 +20,13 @@ public class TaskItemModel implements MVCModel<Task> {
 
     private final TypedValueModel startDateHolder;
     private final TypedValueModel stopDateHolder;
-    private final TypedValueModel taskLabelHolder;
+    private final LabeledBeanHolder<Task> taskLabelHolder;
     private final TypedValueModel tagSetHolder;
+    private final ActionListener editButtonAction;
 
-    public TaskItemModel() {
+    public TaskItemModel(ActionListener editButtonAction) {
+        this.editButtonAction = editButtonAction;
+
         startDateHolder = new TaskDateValueHolder();
         stopDateHolder = new TaskDateValueHolder();
         taskLabelHolder = new LabeledBeanHolder();
@@ -31,7 +35,7 @@ public class TaskItemModel implements MVCModel<Task> {
 
     @Override
     public Task getDomainBean() {
-        return null;
+        return getTaskLabelHolder().getValue();
     }
 
     @Override
@@ -50,11 +54,15 @@ public class TaskItemModel implements MVCModel<Task> {
         return stopDateHolder;
     }
 
-    public TypedValueModel getTaskLabelHolder() {
+    public LabeledBeanHolder<Task> getTaskLabelHolder() {
         return taskLabelHolder;
     }
 
     public TypedValueModel getTagSetHolder() {
         return tagSetHolder;
+    }
+
+    protected ActionListener getEditTaskAction() {
+        return editButtonAction;
     }
 }

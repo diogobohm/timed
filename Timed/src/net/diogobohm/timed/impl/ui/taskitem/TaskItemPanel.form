@@ -4,6 +4,9 @@
   <Properties>
     <Property name="opaque" type="boolean" value="false"/>
   </Properties>
+  <Events>
+    <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="formMouseClicked"/>
+  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -114,9 +117,9 @@
         <Property name="text" type="java.lang.String" value="Edit"/>
         <Property name="opaque" type="boolean" value="false"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editTaskButtonActionPerformed"/>
-      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="editTaskButton.addActionListener(model.getEditTaskAction());"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>
