@@ -4,9 +4,12 @@ import com.google.common.collect.Lists;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import java.io.File;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.UIManager;
 import net.diogobohm.timed.api.db.access.Database;
 import net.diogobohm.timed.api.db.access.DatabaseConnection;
+import net.diogobohm.timed.api.db.access.configuration.DBObjectConfiguration;
 import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
 import net.diogobohm.timed.api.db.serializer.DBPersistenceOrchestrator;
 import net.diogobohm.timed.api.domain.Task;
@@ -31,13 +34,11 @@ public class Main {
 
         Database db = DatabaseConnection.getConnection();
         DBPersistenceOrchestrator orchestrator = new DBPersistenceOrchestrator();
-        
+
         Collection<Task> hamsterTasks = migrateDatabase();
 
         try {
-            for (Task task : hamsterTasks) {
-                orchestrator.writeTask(db, task);
-            }
+            orchestrator.writeTasks(db, hamsterTasks);
         } catch (DatabaseAccessException ex) {
             System.err.println("Error migrating hamster database!");
             ex.printStackTrace();
@@ -72,5 +73,14 @@ public class Main {
         }
 
         return hamsterTasks;
+    }
+
+    private static int getTaskNumber(Database db) {
+        try {
+            return db.loadObjects(DBObjectConfiguration.TASK).size();
+        } catch (DatabaseAccessException ex) {
+            ex.printStackTrace();
+        }
+        return 0;
     }
 }

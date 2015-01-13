@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +17,7 @@ import net.diogobohm.timed.api.codec.ProjectCodec;
 import net.diogobohm.timed.api.codec.TagCodec;
 import net.diogobohm.timed.api.codec.TaskCodec;
 import net.diogobohm.timed.api.db.access.Database;
+import net.diogobohm.timed.api.db.access.DatabaseObject;
 import net.diogobohm.timed.api.db.access.configuration.DBObjectConfiguration;
 import net.diogobohm.timed.api.db.domain.DBActivity;
 import net.diogobohm.timed.api.db.domain.DBProject;
@@ -31,6 +33,7 @@ import net.diogobohm.timed.impl.codec.ActivityCodecImpl;
 import net.diogobohm.timed.impl.codec.ProjectCodecImpl;
 import net.diogobohm.timed.impl.codec.TagCodecImpl;
 import net.diogobohm.timed.impl.codec.TaskCodecImpl;
+import org.eclipse.persistence.platform.database.DB2MainframePlatform;
 
 /**
  *
@@ -54,8 +57,8 @@ public class DBPersistenceOrchestrator {
         Map<Integer, Activity> activities = loadActivityIndex(database);
         Map<Integer, Project> projects = loadProjectIndex(database);
         Multimap<Integer, Tag> tagIndex = loadTagIndex(database);
-        List<DBTask> dbTasks = database.loadObjects(DBObjectConfiguration.TASK);
         List<Task> tasks = Lists.newArrayList();
+        List<DBTask> dbTasks = loadObjects(database, DBObjectConfiguration.TASK);
 
         for (DBTask task : dbTasks) {
             Activity activity = activities.get(task.getActivityId());
@@ -70,7 +73,7 @@ public class DBPersistenceOrchestrator {
 
     public Map<Integer, Activity> loadActivityIndex(Database database) throws DatabaseAccessException {
         Map<Integer, Activity> activities = Maps.newHashMap();
-        List<DBActivity> dbActivities = database.loadObjects(DBObjectConfiguration.ACTIVITY);
+        List<DBActivity> dbActivities = loadObjects(database, DBObjectConfiguration.ACTIVITY);
 
         for (DBActivity activity : dbActivities) {
             activities.put(activity.getId(), activityCodec.decode(activity));
@@ -81,7 +84,7 @@ public class DBPersistenceOrchestrator {
 
     public Map<Integer, Project> loadProjectIndex(Database database) throws DatabaseAccessException {
         Map<Integer, Project> projects = Maps.newHashMap();
-        List<DBProject> dbProjects = database.loadObjects(DBObjectConfiguration.PROJECT);
+        List<DBProject> dbProjects = loadObjects(database, DBObjectConfiguration.PROJECT);
 
         for (DBProject project : dbProjects) {
             projects.put(project.getId(), projectCodec.decode(project));
@@ -93,8 +96,8 @@ public class DBPersistenceOrchestrator {
     public Multimap<Integer, Tag> loadTagIndex(Database database) throws DatabaseAccessException {
         Multimap<Integer, Tag> taskTags = HashMultimap.create();
         Map<Integer, Tag> tagIndex = Maps.newHashMap();
-        List<DBTag> dbTags = database.loadObjects(DBObjectConfiguration.TAG);
-        List<DBTaskTag> dbTaskTags = database.loadObjects(DBObjectConfiguration.TASK_TAG);
+        List<DBTag> dbTags = loadObjects(database, DBObjectConfiguration.TAG);
+        List<DBTaskTag> dbTaskTags = loadObjects(database, DBObjectConfiguration.TASK_TAG);
 
         for (DBTag tag : dbTags) {
             tagIndex.put(tag.getId(), tagCodec.decode(tag));
@@ -107,7 +110,29 @@ public class DBPersistenceOrchestrator {
         return taskTags;
     }
 
-    public Integer writeTask(Database database, Task task) throws DatabaseAccessException {
+    public Integer writeSingleTask(Database database, Task task) throws DatabaseAccessException {
+        database.startTransaction();
+
+        try {
+            return writeTask(database, task);
+        } finally {
+            database.closeTransaction();
+        }
+    }
+
+    public void writeTasks(Database database, Collection<Task> tasks) throws DatabaseAccessException {
+        database.startTransaction();
+
+        try {
+            for (Task task : tasks) {
+                writeTask(database, task);
+            }
+        } finally {
+            database.closeTransaction();
+        }
+    }
+
+    private Integer writeTask(Database database, Task task) throws DatabaseAccessException {
         Integer activityId = writeActivity(database, task.getActivity());
         Integer projectId = writeProject(database, task.getProject());
         Set<Integer> tagIds = writeTags(database, task.getTags());
@@ -166,5 +191,15 @@ public class DBPersistenceOrchestrator {
         }
 
         return tagSet;
+    }
+
+    private <T extends DatabaseObject> List<T> loadObjects(Database database, DBObjectConfiguration configuration) throws DatabaseAccessException {
+        List<T> objectList;
+        
+        database.startTransaction();
+        objectList = database.loadObjects(configuration);
+        database.closeTransaction();
+
+        return objectList;
     }
 }

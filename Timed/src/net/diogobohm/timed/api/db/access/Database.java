@@ -30,13 +30,11 @@ public class Database {
     Database() {
         initializeDatabase();
     }
-
+    
     public void write(DatabaseObject object) throws DatabaseAccessException {
         DBObjectConfiguration configuration = object.getConfiguration();
         DBTableConfiguration tableConfuration = configuration.getTableConfiguration();
         DBSerializer serializer = configuration.getSerializer();
-
-        startTransaction();
 
         ISqlJetTable table = getTable(tableConfuration.getTableName());
         ISqlJetCursor cursor = null;
@@ -47,7 +45,6 @@ public class Database {
         try {
             cursor = table.lookup(indexName, indexValue);
         } catch (SqlJetException exception) {
-            closeTransaction();
             throw new DatabaseAccessException(exception,
                     "Error on object lookup at " + tableConfuration.getTableName());
         }
@@ -60,9 +57,11 @@ public class Database {
                 id = insertRecord(table, serializer.serialize(object));
             } else {
                 object.setId(Long.valueOf(cursor.getRowId()).intValue());
-                if (!object.equals(serializer.deserialize(cursor.getRowValues()))) {
+                DatabaseObject currObject = serializer.deserialize(cursor.getRowValues());
+                
+                if (!currObject.equals(object)) {
                     id = updateRecord(cursor, serializer.serialize(object));
-                    System.out.println("Updating " + object);
+                    System.out.println("Updating " + currObject + " to " + object);
                 } else {
                     id = Long.valueOf(cursor.getRowId()).intValue();
                 }
@@ -72,8 +71,6 @@ public class Database {
         } catch (SqlJetException insertException) {
             throw new DatabaseAccessException(insertException,
                     "Error writing object at " + tableConfuration.getTableName());
-        } finally {
-            closeTransaction();
         }
 
         object.setId(id);
@@ -82,7 +79,6 @@ public class Database {
     public void remove(DatabaseObject object) throws DatabaseAccessException {
         DBObjectConfiguration configuration = object.getConfiguration();
         DBTableConfiguration tableConfuration = configuration.getTableConfiguration();
-        startTransaction();
 
         try {
             ISqlJetTable table = getTable(tableConfuration.getTableName());
@@ -95,15 +91,12 @@ public class Database {
             cursor.close();
         } catch (SqlJetException exception) {
             throw new DatabaseAccessException(exception, "Error removing object at " + tableConfuration.getTableName());
-        } finally {
-            closeTransaction();
         }
     }
 
     public void loadIdFromAttributes(DatabaseObject object) throws DatabaseAccessException {
         DBObjectConfiguration configuration = object.getConfiguration();
         DBTableConfiguration tableConfuration = configuration.getTableConfiguration();
-        startTransaction();
 
         try {
             ISqlJetTable table = getTable(tableConfuration.getTableName());
@@ -118,14 +111,11 @@ public class Database {
             cursor.close();
         } catch (SqlJetException exception) {
             throw new DatabaseAccessException(exception, "Error selecting object at " + tableConfuration.getTableName());
-        } finally {
-            closeTransaction();
         }
     }
 
     public <T extends DatabaseObject> List<T> loadObjects(DBObjectConfiguration configuration) throws DatabaseAccessException {
         List<T> objects = Lists.newArrayList();
-        startTransaction();
 
         DBSerializer<T> serializer = configuration.getSerializer();
         ISqlJetTable table = getTable(configuration.getTableConfiguration().getTableName());
@@ -142,8 +132,6 @@ public class Database {
             cursor.close();
         } catch (SqlJetException exception) {
             throw new DatabaseAccessException(exception, "Error selecting activities!");
-        } finally {
-            closeTransaction();
         }
 
         return objects;
@@ -171,7 +159,7 @@ public class Database {
         }
     }
 
-    private void startTransaction() throws DatabaseAccessException {
+    public void startTransaction() throws DatabaseAccessException {
         try {
             connection.beginTransaction(SqlJetTransactionMode.WRITE);
         } catch (SqlJetException exception) {
@@ -179,11 +167,19 @@ public class Database {
         }
     }
 
-    private void closeTransaction() throws DatabaseAccessException {
+    public void closeTransaction() throws DatabaseAccessException {
         try {
             connection.commit();
         } catch (SqlJetException exception) {
-            throw new DatabaseAccessException(exception, "Error starting transaction!");
+            throw new DatabaseAccessException(exception, "Error closing transaction!");
+        }
+    }
+    
+    public void rollbackTransaction() throws DatabaseAccessException {
+        try {
+            connection.rollback();
+        } catch (SqlJetException exception) {
+            throw new DatabaseAccessException(exception, "Error rolling back transaction!");
         }
     }
 

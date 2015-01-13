@@ -7,13 +7,17 @@ import com.google.common.base.Optional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 import net.diogobohm.timed.api.codec.TaskCodec;
 import net.diogobohm.timed.api.db.domain.DBTask;
 import net.diogobohm.timed.api.domain.Activity;
 import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.domain.Tag;
 import net.diogobohm.timed.api.domain.Task;
+import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.commons.lang3.time.FastDateParser;
 
 /**
  *
@@ -21,8 +25,8 @@ import net.diogobohm.timed.api.domain.Task;
  */
 public class TaskCodecImpl implements TaskCodec {
 
-    private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd hh:mm");
-
+    private static final FastDateFormat DATETIME_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd HH:mm");
+    
     @Override
     public DBTask encode(Task task, Integer activityId, Integer projectId) {
         String start = DATETIME_FORMATTER.format(task.getStart());

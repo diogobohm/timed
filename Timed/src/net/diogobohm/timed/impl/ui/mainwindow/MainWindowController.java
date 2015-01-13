@@ -3,17 +3,10 @@
  */
 package net.diogobohm.timed.impl.ui.mainwindow;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
 import javax.swing.JFrame;
-import net.diogobohm.timed.api.domain.Activity;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.ui.domain.Dashboard;
-import net.diogobohm.timed.api.domain.Project;
-import net.diogobohm.timed.api.domain.Tag;
 import net.diogobohm.timed.api.domain.Task;
 
 /**
