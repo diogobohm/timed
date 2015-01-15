@@ -5,11 +5,8 @@ package net.diogobohm.timed.impl.codec;
 
 import com.google.common.base.Optional;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Set;
-import java.util.TimeZone;
 import net.diogobohm.timed.api.codec.TaskCodec;
 import net.diogobohm.timed.api.db.domain.DBTask;
 import net.diogobohm.timed.api.domain.Activity;
@@ -17,7 +14,6 @@ import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.domain.Tag;
 import net.diogobohm.timed.api.domain.Task;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.apache.commons.lang3.time.FastDateParser;
 
 /**
  *
@@ -56,6 +52,14 @@ public class TaskCodecImpl implements TaskCodec {
         }
 
         return new Task(activity, project, start, end, description, tags);
+    }
+
+    @Override
+    public boolean indexChanged(Task value1, Task value2) {
+        DBTask task1 = encode(value1, 0, 0);
+        DBTask task2 = encode(value2, 0, 0);
+
+        return !task1.getIndexValue().equals(task2.getIndexValue());
     }
 
 }

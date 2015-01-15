@@ -33,7 +33,6 @@ import net.diogobohm.timed.impl.codec.ActivityCodecImpl;
 import net.diogobohm.timed.impl.codec.ProjectCodecImpl;
 import net.diogobohm.timed.impl.codec.TagCodecImpl;
 import net.diogobohm.timed.impl.codec.TaskCodecImpl;
-import org.eclipse.persistence.platform.database.DB2MainframePlatform;
 
 /**
  *
@@ -140,7 +139,7 @@ public class DBPersistenceOrchestrator {
         }
 
         for (DBTaskTag taskTag : dbTaskTags) {
-            tagIndex.put(taskTag.getTaskId(), tagIndex.get(taskTag.getTagId()));
+            taskTags.put(taskTag.getTaskId(), tagIndex.get(taskTag.getTagId()));
         }
 
         return taskTags;
@@ -150,7 +149,7 @@ public class DBPersistenceOrchestrator {
         database.startTransaction();
 
         try {
-            return writeTask(database, task);
+            return DBPersistenceOrchestrator.this.writeTask(database, task);
         } finally {
             database.closeTransaction();
         }
@@ -168,6 +167,20 @@ public class DBPersistenceOrchestrator {
         }
     }
 
+    public void writeTask(Database database, Task oldValue, Task newValue) throws DatabaseAccessException {
+        database.startTransaction();
+
+        try {
+            if (taskCodec.indexChanged(oldValue, newValue)) {
+                removeTask(database, oldValue);
+            }
+
+            writeTask(database, newValue);
+        } finally {
+            database.closeTransaction();
+        }
+    }
+
     private Integer writeTask(Database database, Task task) throws DatabaseAccessException {
         Integer activityId = writeActivity(database, task.getActivity());
         Integer projectId = writeProject(database, task.getProject());
@@ -179,6 +192,17 @@ public class DBPersistenceOrchestrator {
         writeTaskTags(database, dbTask.getId(), tagIds);
 
         return dbTask.getId();
+    }
+
+    private void removeTask(Database database, Task task) throws DatabaseAccessException {
+        Integer activityId = writeActivity(database, task.getActivity());
+        Integer projectId = writeProject(database, task.getProject());
+        Set<Integer> tagIds = writeTags(database, task.getTags());
+        DBTask dbTask = taskCodec.encode(task, activityId, projectId);
+
+        removeTaskTags(database, dbTask.getId(), tagIds);
+
+        database.remove(dbTask);
     }
 
     public Integer writeActivity(Database database, Activity activity) throws DatabaseAccessException {
@@ -216,6 +240,18 @@ public class DBPersistenceOrchestrator {
     private void writeTaskTags(Database database, Integer taskId, Set<Integer> tagIds) throws DatabaseAccessException {
         for (Integer tagId : tagIds) {
             writeTaskTag(database, taskId, tagId);
+        }
+    }
+
+    private void removeTaskTag(Database database, Integer taskId, Integer tagId) throws DatabaseAccessException {
+        DBTaskTag dbTaskTag = new DBTaskTag(taskId, tagId);
+
+        database.remove(dbTaskTag);
+    }
+
+    private void removeTaskTags(Database database, Integer taskId, Set<Integer> tagIds) throws DatabaseAccessException {
+        for (Integer tagId : tagIds) {
+            removeTaskTag(database, taskId, tagId);
         }
     }
 

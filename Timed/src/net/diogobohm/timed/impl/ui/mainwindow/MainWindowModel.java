@@ -14,6 +14,7 @@ import net.diogobohm.timed.api.ui.mvc.model.TypedValueHolder;
 import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Tag;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.impl.ui.tasklist.TaskListModel;
 
 /**
  *
@@ -21,16 +22,15 @@ import net.diogobohm.timed.api.domain.Task;
  */
 public class MainWindowModel implements MVCModel<Dashboard> {
 
+    private final TaskListModel taskListModel;
     private final TagSetHolder currentTaskTagsHolder;
     private final DashboardTaskValueHolder currentTaskHolder;
-    private final TypedValueHolder<List<Task>> taskListHolder;
 
-    public MainWindowModel() {
+    public MainWindowModel(TaskListModel taskListModel) {
+        this.taskListModel = taskListModel;
+
         currentTaskTagsHolder = new TagSetHolder();
         currentTaskHolder = new DashboardTaskValueHolder();
-        taskListHolder = new TypedValueHolder();
-
-        taskListHolder.setValue(new ArrayList<Task>());
     }
 
     public DashboardTaskValueHolder getCurrentTaskHolder() {
@@ -41,8 +41,8 @@ public class MainWindowModel implements MVCModel<Dashboard> {
         return currentTaskTagsHolder;
     }
 
-    public TypedValueHolder<List<Task>> getTaskListHolder() {
-        return taskListHolder;
+    public TaskListModel getTaskListModel() {
+        return taskListModel;
     }
 
     @Override
@@ -54,14 +54,14 @@ public class MainWindowModel implements MVCModel<Dashboard> {
     public void setDomainBean(Dashboard domainBean) {
         Optional<Task> currentTask = domainBean.getCurrentTask();
 
-        getCurrentTaskHolder().setValue(domainBean.getCurrentTask());
+        getCurrentTaskHolder().setValue(currentTask);
+        getTaskListModel().setDomainBean(domainBean.getTasks());
 
         if (currentTask.isPresent()) {
             getCurrentTaskTagsHolder().setValue(domainBean.getCurrentTask().get().getTags());
         } else {
             getCurrentTaskTagsHolder().setValue(Sets.<Tag>newHashSet());
         }
-        getTaskListHolder().setValue(domainBean.getTasks());
     }
 
 }

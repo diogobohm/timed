@@ -20,23 +20,7 @@ public class TagSetHolder extends AbstractTypedValueModel<Set<Tag>> {
             return "No tags.";
         }
 
-        return buildHashTags(tagSet);
-    }
-
-    private String buildHashTags(Set<Tag> tagSet) {
-        StringBuilder build = new StringBuilder();
-        boolean first = true;
-
-        for (Tag tag : tagSet) {
-            if (!first) {
-                build.append(String.format(", #%s", tag.getName()));
-            } else {
-                build.append(String.format("#%s", tag.getName()));
-                first = false;
-            }
-        }
-
-        return build.toString();
+        return Tag.buildTagString(tagSet);
     }
 
 }

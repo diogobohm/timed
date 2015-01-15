@@ -73,7 +73,8 @@ public class Task implements LabeledBean {
 
     @Override
     public String getLabel() {
-        return getActivity().getName() + "@" + getProject().getName();
+        String tags = Tag.buildTagString(getTags());
+        return getActivity().getName() + "@" + getProject().getName() + " " + tags;
     }
 
 }

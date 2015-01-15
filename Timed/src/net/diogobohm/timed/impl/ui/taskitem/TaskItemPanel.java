@@ -4,6 +4,7 @@
 package net.diogobohm.timed.impl.ui.taskitem;
 
 import com.jgoodies.binding.adapter.Bindings;
+import java.awt.event.ActionListener;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 import net.diogobohm.timed.api.ui.mvc.model.formatter.TaskTimeFormatter;
 
@@ -16,12 +17,14 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
     private static final TaskTimeFormatter TIME_FORMATTER = new TaskTimeFormatter();
 
     private final TaskItemModel model;
+    private final ActionListener editAction;
 
     /**
      * Creates new form TaskItemPanel
      */
-    public TaskItemPanel(TaskItemModel model) {
+    public TaskItemPanel(TaskItemModel model, ActionListener editAction) {
         this.model = model;
+        this.editAction = editAction;
 
         initComponents();
     }
@@ -38,15 +41,9 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
         timeSplitLabel = new javax.swing.JLabel();
         stopTimeLabel = new javax.swing.JLabel();
         taskNameLabel = new javax.swing.JLabel();
-        tagListLabel = new javax.swing.JLabel();
         editTaskButton = new javax.swing.JButton();
 
         setOpaque(false);
-        addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                formMouseClicked(evt);
-            }
-        });
 
         startTimeLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         startTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -66,14 +63,14 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
         taskNameLabel.setText("TaskName");
         Bindings.bind(taskNameLabel, model.getTaskLabelHolder().getRenderer());
 
-        tagListLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        tagListLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        tagListLabel.setText("#Tag1, #Tag2");
-        Bindings.bind(tagListLabel, model.getTagSetHolder().getRenderer());
-
-        editTaskButton.setText("Edit");
+        editTaskButton.setText("X");
+        editTaskButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
         editTaskButton.setOpaque(false);
-        editTaskButton.addActionListener(model.getEditTaskAction());
+        editTaskButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editTaskButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -87,9 +84,7 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(stopTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
-                .addComponent(taskNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(tagListLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(taskNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(editTaskButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -102,22 +97,20 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
                     .addComponent(timeSplitLabel)
                     .addComponent(stopTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(taskNameLabel)
-                    .addComponent(tagListLabel)
                     .addComponent(editTaskButton))
                 .addGap(9, 9, 9))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        editTaskButton.doClick();
-    }//GEN-LAST:event_formMouseClicked
+    private void editTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editTaskButtonActionPerformed
+        editAction.actionPerformed(evt);
+    }//GEN-LAST:event_editTaskButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton editTaskButton;
     private javax.swing.JLabel startTimeLabel;
     private javax.swing.JLabel stopTimeLabel;
-    private javax.swing.JLabel tagListLabel;
     private javax.swing.JLabel taskNameLabel;
     private javax.swing.JLabel timeSplitLabel;
     // End of variables declaration//GEN-END:variables

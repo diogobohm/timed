@@ -52,7 +52,7 @@ public class Database {
         }
 
         try {
-            if (cursor.eof()) {
+            if (cursor.eof() || !tableConfuration.isUniqueIndex()) {
                 // Register does not exist, create
                 id = insertRecord(table, serializer.serialize(object));
                 object.setId(id);
@@ -77,9 +77,13 @@ public class Database {
         DBObjectConfiguration configuration = object.getConfiguration();
         DBTableConfiguration tableConfuration = configuration.getTableConfiguration();
 
+        String tableName = tableConfuration.getTableName();
+        String indexName = tableConfuration.getIndexName();
+        Object indexValue = object.getIndexValue();
+
         try {
-            ISqlJetTable table = getTable(tableConfuration.getTableName());
-            ISqlJetCursor cursor = table.lookup("id", object.getId());
+            ISqlJetTable table = getTable(tableName);
+            ISqlJetCursor cursor = table.lookup(indexName, indexValue);
 
             while (!cursor.eof()) {
                 cursor.delete();
@@ -87,7 +91,7 @@ public class Database {
 
             cursor.close();
         } catch (SqlJetException exception) {
-            throw new DatabaseAccessException(exception, "Error removing object at " + tableConfuration.getTableName());
+            throw new DatabaseAccessException(exception, "Error removing object at " + tableName);
         }
     }
 

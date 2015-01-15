@@ -19,4 +19,6 @@ public interface TaskCodec {
     DBTask encode(Task task, Integer activityId, Integer projectId);
 
     Task decode(DBTask task, Activity activity, Project project, Set<Tag> tags);
+
+    boolean indexChanged(Task value1, Task value2);
 }

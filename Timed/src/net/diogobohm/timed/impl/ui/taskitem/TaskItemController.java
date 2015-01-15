@@ -12,6 +12,7 @@ import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
 import net.diogobohm.timed.api.db.serializer.DBPersistenceOrchestrator;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.ui.mvc.controller.DomainEditor;
 import net.diogobohm.timed.impl.ui.taskedit.TaskEditController;
 
@@ -21,17 +22,27 @@ import net.diogobohm.timed.impl.ui.taskedit.TaskEditController;
  */
 public class TaskItemController extends MVCController<TaskItemModel, TaskItemPanel> implements DomainEditor<Task> {
 
+    private final DomainEditor<Task> dashboardEditor;
+
     private TaskItemModel model;
     private TaskItemPanel view;
+
+    public TaskItemController(DomainEditor<Task> dashboardEditor) {
+        this.dashboardEditor = dashboardEditor;
+    }
 
     public void setTask(Task task) {
         getModel().setDomainBean(task);
     }
 
+    public Task getTask() {
+        return getModel().getDomainBean();
+    }
+
     @Override
     protected TaskItemModel getModel() {
         if (model == null) {
-            model = new TaskItemModel(createEditButtonAction());
+            model = new TaskItemModel();
         }
 
         return model;
@@ -40,7 +51,7 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
     @Override
     public TaskItemPanel getView() {
         if (view == null) {
-            view = new TaskItemPanel(getModel());
+            view = new TaskItemPanel(getModel(), createEditButtonAction());
         }
 
         return view;
@@ -52,13 +63,13 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
         DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
 
         try {
-            //db.remove(oldValue);
-            orchestrator.writeTasks(db, Lists.newArrayList(newValue));
+            orchestrator.writeTask(db, oldValue, newValue);
         } catch (DatabaseAccessException exception) {
             exception.printStackTrace();
         }
 
         setTask(newValue);
+        dashboardEditor.updateDomain(oldValue, newValue);
     }
 
     private ActionListener createEditButtonAction() {

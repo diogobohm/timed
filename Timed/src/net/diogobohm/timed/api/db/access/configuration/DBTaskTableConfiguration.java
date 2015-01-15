@@ -38,4 +38,9 @@ public class DBTaskTableConfiguration implements DBTableConfiguration {
         return "CREATE INDEX " + getIndexName() + " ON " + getTableName() + "(start_time);";
     }
 
+    @Override
+    public boolean isUniqueIndex() {
+        return true;
+    }
+
 }

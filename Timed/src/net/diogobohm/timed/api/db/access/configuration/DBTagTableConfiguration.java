@@ -34,4 +34,9 @@ public class DBTagTableConfiguration implements DBTableConfiguration {
         return "CREATE INDEX " + getIndexName() + " ON " + getTableName() + "(name);";
     }
 
+    @Override
+    public boolean isUniqueIndex() {
+        return true;
+    }
+
 }

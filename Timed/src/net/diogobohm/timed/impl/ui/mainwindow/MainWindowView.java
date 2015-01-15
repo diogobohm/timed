@@ -6,22 +6,23 @@ package net.diogobohm.timed.impl.ui.mainwindow;
 
 import com.jgoodies.binding.adapter.Bindings;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
-import net.diogobohm.timed.api.ui.mvc.model.TaskListModel;
-import net.diogobohm.timed.api.ui.mvc.model.renderer.TaskListCellRenderer;
+import net.diogobohm.timed.impl.ui.tasklist.TaskListPanel;
 
 /**
  *
  * @author diogo
  */
-public class MainWindow extends javax.swing.JFrame implements MVCView {
+public class MainWindowView extends javax.swing.JFrame implements MVCView {
 
     private final MainWindowModel model;
+    private final TaskListPanel taskListPanel;
 
 	/**
 	 * Creates new form MainWindow
 	 */
-    public MainWindow(MainWindowModel model) {
+    public MainWindowView(MainWindowModel model, TaskListPanel taskListPanel) {
         this.model = model;
+        this.taskListPanel = taskListPanel;
 
         initComponents();
     }
@@ -43,11 +44,13 @@ public class MainWindow extends javax.swing.JFrame implements MVCView {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        taskList = new javax.swing.JList();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        taskListPanel1 = this.taskListPanel;
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TimeD");
+        setMinimumSize(new java.awt.Dimension(550, 450));
+        setPreferredSize(new java.awt.Dimension(550, 450));
 
         currentTaskNameLabel.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         currentTaskNameLabel.setText("Task Name");
@@ -86,15 +89,7 @@ public class MainWindow extends javax.swing.JFrame implements MVCView {
 
         jLabel4.setText("WorkedTimeToday");
 
-        taskList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
-        taskList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        taskList.setModel(new TaskListModel(model.getTaskListHolder()));
-        taskList.setCellRenderer(new TaskListCellRenderer());
-        jScrollPane2.setViewportView(taskList);
+        jScrollPane1.setViewportView(taskListPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -117,8 +112,10 @@ public class MainWindow extends javax.swing.JFrame implements MVCView {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1))
                     .addComponent(tagSetLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel3)
-                    .addComponent(jScrollPane2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -137,7 +134,7 @@ public class MainWindow extends javax.swing.JFrame implements MVCView {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3)
@@ -168,10 +165,10 @@ public class MainWindow extends javax.swing.JFrame implements MVCView {
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel tagSetLabel;
-    private javax.swing.JList taskList;
+    private net.diogobohm.timed.impl.ui.tasklist.TaskListPanel taskListPanel1;
     // End of variables declaration//GEN-END:variables
 }

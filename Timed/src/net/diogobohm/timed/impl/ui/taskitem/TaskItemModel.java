@@ -4,10 +4,9 @@
 package net.diogobohm.timed.impl.ui.taskitem;
 
 import com.google.common.base.Optional;
-import java.awt.event.ActionListener;
+import java.util.Date;
 import net.diogobohm.timed.api.ui.mvc.MVCModel;
 import net.diogobohm.timed.api.ui.mvc.model.LabeledBeanHolder;
-import net.diogobohm.timed.api.ui.mvc.model.TagSetHolder;
 import net.diogobohm.timed.api.ui.mvc.model.TaskDateValueHolder;
 import net.diogobohm.timed.api.ui.mvc.model.TypedValueModel;
 import net.diogobohm.timed.api.domain.Task;
@@ -18,19 +17,14 @@ import net.diogobohm.timed.api.domain.Task;
  */
 public class TaskItemModel implements MVCModel<Task> {
 
-    private final TypedValueModel startDateHolder;
-    private final TypedValueModel stopDateHolder;
+    private final TypedValueModel<Optional<Date>> startDateHolder;
+    private final TypedValueModel<Optional<Date>> stopDateHolder;
     private final LabeledBeanHolder<Task> taskLabelHolder;
-    private final TypedValueModel tagSetHolder;
-    private final ActionListener editButtonAction;
 
-    public TaskItemModel(ActionListener editButtonAction) {
-        this.editButtonAction = editButtonAction;
-
+    public TaskItemModel() {
         startDateHolder = new TaskDateValueHolder();
         stopDateHolder = new TaskDateValueHolder();
         taskLabelHolder = new LabeledBeanHolder();
-        tagSetHolder = new TagSetHolder();
     }
 
     @Override
@@ -42,8 +36,7 @@ public class TaskItemModel implements MVCModel<Task> {
     public void setDomainBean(Task task) {
         getStartDateHolder().setValue(Optional.of(task.getStart()));
         getStopDateHolder().setValue(task.getFinish());
-        getTaskLabelHolder().setValue(task);
-        getTagSetHolder().setValue(task.getTags());
+        getTaskLabelHolder().setTypedValue(task);
     }
 
     public TypedValueModel getStartDateHolder() {
@@ -56,13 +49,5 @@ public class TaskItemModel implements MVCModel<Task> {
 
     public LabeledBeanHolder<Task> getTaskLabelHolder() {
         return taskLabelHolder;
-    }
-
-    public TypedValueModel getTagSetHolder() {
-        return tagSetHolder;
-    }
-
-    protected ActionListener getEditTaskAction() {
-        return editButtonAction;
     }
 }

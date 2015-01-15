@@ -17,4 +17,6 @@ public interface DBTableConfiguration {
 
     String getCreateIndexQuery();
 
+    boolean isUniqueIndex();
+
 }

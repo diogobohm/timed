@@ -4,6 +4,7 @@
 package net.diogobohm.timed.impl.ui.taskedit;
 
 import com.jgoodies.binding.adapter.Bindings;
+import java.awt.event.ActionListener;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 
 /**
@@ -13,12 +14,14 @@ import net.diogobohm.timed.api.ui.mvc.MVCView;
 public class TaskEditView extends javax.swing.JFrame implements MVCView {
 
     private final TaskEditModel model;
+    private final ActionListener saveAction;
 
     /**
      * Creates new form TaskEditView
      */
-    public TaskEditView(TaskEditModel model) {
+    public TaskEditView(TaskEditModel model, ActionListener saveAction) {
         this.model = model;
+        this.saveAction = saveAction;
 
         initComponents();
     }
@@ -52,8 +55,8 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Editing Task");
-        setMinimumSize(new java.awt.Dimension(430, 300));
-        setPreferredSize(new java.awt.Dimension(430, 300));
+        setMinimumSize(new java.awt.Dimension(450, 300));
+        setPreferredSize(new java.awt.Dimension(450, 300));
 
         activityLabel.setText("Activity:");
 
@@ -63,19 +66,19 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
         scheduleLabel.setText("Schedule:");
 
         startDateTextField.setText("2015-01-31");
-        Bindings.bind(startDateTextField, model.getStartDateTextHolder().getRenderer());
+        Bindings.bind(startDateTextField, model.getStartDateTextHolder());
 
         startTimeTextField.setText("07:30");
-        Bindings.bind(startTimeTextField, model.getStartTimeTextHolder().getRenderer());
+        Bindings.bind(startTimeTextField, model.getStartTimeTextHolder());
 
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("to");
 
         stopTimeTextField.setText("08:35");
-        Bindings.bind(stopTimeTextField, model.getStopTimeTextHolder().getRenderer());
+        Bindings.bind(stopTimeTextField, model.getStopTimeTextHolder());
 
         onCourseCheckBox.setText("in course");
-        Bindings.bind(onCourseCheckBox, model.getTaskInCourseHolder().getRenderer());
+        Bindings.bind(onCourseCheckBox, model.getTaskInCourseHolder());
 
         descriptionLabel.setText("Description:");
 
@@ -85,7 +88,7 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
         descriptionTextArea.setTabSize(4);
         descriptionTextArea.setText("Here goes some description of the task.");
         jScrollPane1.setViewportView(descriptionTextArea);
-        Bindings.bind(descriptionTextArea, model.getDescriptionHolder().getRenderer());
+        Bindings.bind(descriptionTextArea, model.getDescriptionHolder());
 
         saveButton.setText("Save");
         saveButton.addActionListener(new java.awt.event.ActionListener() {
@@ -120,7 +123,7 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
         projectCombo.setModel(model.getProjectHolder());
 
         tagsTextField.setText("#Tag1 #Tag2");
-        Bindings.bind(tagsTextField, model.getTagExpressionHolder().getRenderer());
+        Bindings.bind(tagsTextField, model.getTagExpressionHolder());
 
         tagsLabel.setText("Tags:");
 
@@ -131,12 +134,6 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(scheduleLabel)
                         .addGap(14, 14, 14)
@@ -144,26 +141,31 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(startTimeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(stopTimeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(onCourseCheckBox)
-                        .addGap(83, 83, 83))
+                        .addGap(0, 88, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(activityLabel)
                             .addComponent(projectLabel)
                             .addComponent(tagsLabel))
                         .addGap(21, 21, 21)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(projectCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(activityCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(projectCombo, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(activityCombo, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(tagsTextField)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(descriptionLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -206,7 +208,7 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        // TODO add your handling code here:
+        saveAction.actionPerformed(evt);
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void disposeWindow(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disposeWindow

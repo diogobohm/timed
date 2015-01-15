@@ -5,11 +5,8 @@ package net.diogobohm.timed.impl.codec;
 
 import com.google.common.collect.Sets;
 import java.util.Set;
-import net.diogobohm.timed.api.codec.ProjectCodec;
 import net.diogobohm.timed.api.codec.TagCodec;
-import net.diogobohm.timed.api.db.domain.DBProject;
 import net.diogobohm.timed.api.db.domain.DBTag;
-import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.domain.Tag;
 
 /**

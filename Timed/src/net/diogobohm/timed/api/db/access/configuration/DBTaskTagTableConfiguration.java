@@ -35,4 +35,9 @@ public class DBTaskTagTableConfiguration implements DBTableConfiguration {
         return "CREATE INDEX " + getIndexName() + " ON " + getTableName() + "(task_id);";
     }
 
+    @Override
+    public boolean isUniqueIndex() {
+        return false;
+    }
+
 }

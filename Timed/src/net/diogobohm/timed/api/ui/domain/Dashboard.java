@@ -5,6 +5,8 @@ package net.diogobohm.timed.api.ui.domain;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import net.diogobohm.timed.api.domain.Task;
 
@@ -14,10 +16,10 @@ import net.diogobohm.timed.api.domain.Task;
  */
 public class Dashboard {
 
-    private final List<Task> tasks;
+    private final LinkedList<Task> tasks;
 
-    public Dashboard() {
-        tasks = Lists.newArrayList();
+    public Dashboard(Collection<Task> tasks) {
+        this.tasks = Lists.newLinkedList(tasks);
     }
 
     public List<Task> getTasks() {
@@ -29,7 +31,7 @@ public class Dashboard {
             return Optional.absent();
         }
 
-        return Optional.of(tasks.get(tasks.size() - 1));
+        return Optional.of(tasks.getLast());
     }
 
 }
