@@ -3,6 +3,7 @@
  */
 package net.diogobohm.timed.api.ui.mvc.model;
 
+import java.util.Collection;
 import net.diogobohm.timed.api.ui.mvc.model.*;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;

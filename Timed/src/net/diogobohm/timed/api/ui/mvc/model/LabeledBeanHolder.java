@@ -10,7 +10,7 @@ import net.diogobohm.timed.api.ui.mvc.model.bean.LabeledBean;
  *
  * @author diogo.bohm
  */
-public class LabeledBeanHolder<T extends LabeledBean> extends NewTypedValueModel<T> {
+public class LabeledBeanHolder<T extends LabeledBean> extends NewTypedValueModel<T> implements RenderedModel {
 
     private NewTypedValueModel<String> renderer;
 
@@ -20,6 +20,7 @@ public class LabeledBeanHolder<T extends LabeledBean> extends NewTypedValueModel
         refreshRenderer();
     }
 
+    @Override
     public ValueModel getRenderer() {
         if (renderer == null) {
             renderer = new NewTypedValueModel();

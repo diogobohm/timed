@@ -19,7 +19,10 @@ public class NewTypedValueModel<T> extends AbstractValueModel {
     }
 
     public void setTypedValue(T newValue) {
+        T oldValue = value;
+
         value = newValue;
+        firePropertyChange(PROPERTY_VALUE, oldValue, newValue);
     }
     
     @Override

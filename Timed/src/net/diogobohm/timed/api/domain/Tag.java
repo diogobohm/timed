@@ -51,16 +51,32 @@ public class Tag {
     }
 
     public static Set<Tag> parseTagsFromString(String tagExpression) {
-        String trimmedTags = tagExpression.replaceAll(" ", "").replaceAll(",", "").replaceAll(";", "");
+        String cleanTags = cleanExpression(tagExpression);
         Set<Tag> tagSet = Sets.newHashSet();
 
-        for (String tagName : trimmedTags.split("#")) {
+        for (String tagName : cleanTags.split("#")) {
             if (!tagName.isEmpty()) {
                 tagSet.add(new Tag(tagName));
             }
         }
 
         return tagSet;
+    }
+
+    private static String cleanExpression(String expression) {
+        if (expression == null) {
+            expression = "";
+        }
+
+        return removeFormatting(removeFormatting(removeFormatting(expression, " "), ","), ";");
+    }
+
+    private static String removeFormatting(String originalString, String regex) {
+        if (!originalString.isEmpty()) {
+            return originalString.replaceAll(regex, "");
+        }
+
+        return originalString;
     }
 
 }

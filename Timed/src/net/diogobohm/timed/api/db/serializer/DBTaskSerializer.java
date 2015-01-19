@@ -6,7 +6,6 @@ package net.diogobohm.timed.api.db.serializer;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import net.diogobohm.timed.api.db.domain.DBTask;
-import net.diogobohm.timed.api.db.domain.DBTaskTag;
 
 /**
  *
