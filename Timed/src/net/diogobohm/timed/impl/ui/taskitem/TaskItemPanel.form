@@ -2,8 +2,17 @@
 
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <Properties>
+    <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="null"/>
+    </Property>
+    <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[442, 28]"/>
+    </Property>
     <Property name="opaque" type="boolean" value="false"/>
   </Properties>
+  <Events>
+    <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="formMouseClicked"/>
+  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -27,10 +36,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="stopTimeLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-              <Component id="taskNameLabel" pref="260" max="32767" attributes="0"/>
+              <Component id="taskNameLabel" pref="208" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="editTaskButton" min="-2" pref="26" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="taskElapsedTimeLabel" min="-2" pref="76" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -42,9 +51,9 @@
                   <Component id="timeSplitLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="stopTimeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="taskNameLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="editTaskButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="taskElapsedTimeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -94,17 +103,14 @@
         <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="Bindings.bind(taskNameLabel, model.getTaskLabelHolder().getRenderer());"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JButton" name="editTaskButton">
+    <Component class="javax.swing.JLabel" name="taskElapsedTimeLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="X"/>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[0, 0, 0, 0]"/>
-        </Property>
-        <Property name="opaque" type="boolean" value="false"/>
+        <Property name="horizontalAlignment" type="int" value="11"/>
+        <Property name="text" type="java.lang.String" value="TaskTime"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editTaskButtonActionPerformed"/>
-      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="Bindings.bind(taskElapsedTimeLabel, model.getTaskElapsedTimeHolder());"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

@@ -3,7 +3,6 @@
  */
 package net.diogobohm.timed.impl.ui.taskitem;
 
-import com.google.common.collect.Lists;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import net.diogobohm.timed.api.db.access.Database;
@@ -12,7 +11,6 @@ import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
 import net.diogobohm.timed.api.db.serializer.DBPersistenceOrchestrator;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.domain.Task;
-import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.ui.mvc.controller.DomainEditor;
 import net.diogobohm.timed.impl.ui.taskedit.TaskEditController;
 
@@ -51,7 +49,7 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
     @Override
     public TaskItemPanel getView() {
         if (view == null) {
-            view = new TaskItemPanel(getModel(), createEditButtonAction());
+            view = new TaskItemPanel(getModel(), createEditTaskAction(), createDeleteTaskAction());
         }
 
         return view;
@@ -72,7 +70,20 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
         dashboardEditor.updateDomain(oldValue, newValue);
     }
 
-    private ActionListener createEditButtonAction() {
+    private void deleteDomain(Task taskToDelete) {
+        Database db = DatabaseConnection.getConnection();
+        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
+
+        try {
+            orchestrator.removeSingleTask(db, taskToDelete);
+        } catch (DatabaseAccessException exception) {
+            exception.printStackTrace();
+        }
+
+        dashboardEditor.updateDomain(taskToDelete, null);
+    }
+
+    private ActionListener createEditTaskAction() {
         final DomainEditor<Task> caller = this;
 
         return new ActionListener() {
@@ -84,4 +95,19 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
             }
         };
     }
+
+    private ActionListener createDeleteTaskAction() {
+        final DomainEditor<Task> caller = this;
+
+        return new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Task task = model.getDomainBean();
+
+                deleteDomain(task);
+            }
+        };
+    }
+
 }

@@ -1,7 +1,7 @@
 /**
  * TODO: define a license.
  */
-package net.diogobohm.timed.impl.ui.taskitem;
+package net.diogobohm.timed.impl.ui.daytasklist;
 
 import com.google.common.base.Optional;
 import java.util.Date;
@@ -16,14 +16,14 @@ import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
  *
  * @author diogo.bohm
  */
-public class TaskItemModel implements MVCModel<Task> {
+public class DayTaskListModel implements MVCModel<Task> {
 
     private final TypedValueModel<Optional<Date>> startDateHolder;
     private final TypedValueModel<Optional<Date>> stopDateHolder;
     private final LabeledBeanHolder<Task> taskLabelHolder;
     private final NewTypedValueModel<String> taskElapsedTimeHolder;
 
-    public TaskItemModel() {
+    public DayTaskListModel() {
         startDateHolder = new TaskDateValueHolder();
         stopDateHolder = new TaskDateValueHolder();
         taskLabelHolder = new LabeledBeanHolder();

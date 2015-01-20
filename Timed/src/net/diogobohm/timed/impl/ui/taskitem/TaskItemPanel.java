@@ -5,8 +5,10 @@ package net.diogobohm.timed.impl.ui.taskitem;
 
 import com.jgoodies.binding.adapter.Bindings;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 import net.diogobohm.timed.api.ui.mvc.model.formatter.TaskTimeFormatter;
+import net.diogobohm.timed.impl.ui.taskitem.editmenu.TaskItemEditMenu;
 
 /**
  *
@@ -18,13 +20,15 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
 
     private final TaskItemModel model;
     private final ActionListener editAction;
+    private final ActionListener deleteAction;
 
     /**
      * Creates new form TaskItemPanel
      */
-    public TaskItemPanel(TaskItemModel model, ActionListener editAction) {
+    public TaskItemPanel(TaskItemModel model, ActionListener editAction, ActionListener deleteAction) {
         this.model = model;
         this.editAction = editAction;
+        this.deleteAction = deleteAction;
 
         initComponents();
     }
@@ -41,9 +45,16 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
         timeSplitLabel = new javax.swing.JLabel();
         stopTimeLabel = new javax.swing.JLabel();
         taskNameLabel = new javax.swing.JLabel();
-        editTaskButton = new javax.swing.JButton();
+        taskElapsedTimeLabel = new javax.swing.JLabel();
 
+        setMaximumSize(null);
+        setMinimumSize(new java.awt.Dimension(442, 28));
         setOpaque(false);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
 
         startTimeLabel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         startTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -63,14 +74,9 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
         taskNameLabel.setText("TaskName");
         Bindings.bind(taskNameLabel, model.getTaskLabelHolder().getRenderer());
 
-        editTaskButton.setText("X");
-        editTaskButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        editTaskButton.setOpaque(false);
-        editTaskButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editTaskButtonActionPerformed(evt);
-            }
-        });
+        taskElapsedTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        taskElapsedTimeLabel.setText("TaskTime");
+        Bindings.bind(taskElapsedTimeLabel, model.getTaskElapsedTimeHolder());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -84,9 +90,9 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(stopTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
-                .addComponent(taskNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                .addComponent(taskNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(editTaskButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(taskElapsedTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -97,20 +103,23 @@ public class TaskItemPanel extends javax.swing.JPanel implements MVCView {
                     .addComponent(timeSplitLabel)
                     .addComponent(stopTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(taskNameLabel)
-                    .addComponent(editTaskButton))
-                .addGap(9, 9, 9))
+                    .addComponent(taskElapsedTimeLabel))
+                .addGap(12, 12, 12))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void editTaskButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editTaskButtonActionPerformed
-        editAction.actionPerformed(evt);
-    }//GEN-LAST:event_editTaskButtonActionPerformed
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+        if (evt.getButton() == MouseEvent.BUTTON3) {
+            TaskItemEditMenu menu = new TaskItemEditMenu(editAction, deleteAction);
+            menu.show(this, evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_formMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton editTaskButton;
     private javax.swing.JLabel startTimeLabel;
     private javax.swing.JLabel stopTimeLabel;
+    private javax.swing.JLabel taskElapsedTimeLabel;
     private javax.swing.JLabel taskNameLabel;
     private javax.swing.JLabel timeSplitLabel;
     // End of variables declaration//GEN-END:variables

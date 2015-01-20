@@ -1,7 +1,7 @@
 /**
  * TODO: define a license.
  */
-package net.diogobohm.timed.impl.ui.mainwindow;
+package net.diogobohm.timed.impl.ui.overviewwindow;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -21,64 +21,31 @@ import net.diogobohm.timed.api.ui.mvc.model.LabeledBeanHolder;
 import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
 import net.diogobohm.timed.api.ui.mvc.model.TypedComboBoxModel;
 import net.diogobohm.timed.api.ui.mvc.model.bean.LabeledBean;
+import net.diogobohm.timed.impl.ui.daytasklist.DayTaskListController;
+import net.diogobohm.timed.impl.ui.factory.DayTaskListControllerFactory;
+import net.diogobohm.timed.impl.ui.factory.TaskItemControllerFactory;
 import net.diogobohm.timed.impl.ui.tasklist.TaskListModel;
 
 /**
  *
  * @author diogo.bohm
  */
-public class MainWindowModel implements MVCModel<Dashboard> {
+public class OverviewWindowModel implements MVCModel<Overview> {
 
-    private static final Activity NO_ACTIVITY = new Activity("Not currently working.");
-    private static final Project NO_PROJECT = new Project("");
-
-    private final TypedComboBoxModel<String> newActivityComboHolder;
-    private final TypedComboBoxModel<String> newProjectComboHolder;
-    private final NewTypedValueModel<String> newTaskTagsHolder;
-    private final LabeledBeanHolder<Activity> currentActivityHolder;
-    private final LabeledBeanHolder<Project> currentProjectHolder;
-    private final TagSetHolder currentTaskTagsHolder;
-    private final TaskListModel taskListModel;
-    private final NewTypedValueModel<String> workedTimeHolder;
-    private final NewTypedValueModel<Optional<Task>> currentTaskHolder;
+    private final NewTypedValueModel<String> startDateHolder;
+    private final NewTypedValueModel<String> endDateHolder;
+    private final NewTypedValueModel<List<DayTaskListController>> taskListsHolder;
+    private final DayTaskListControllerFactory itemFactory;
     
-    public MainWindowModel(TaskListModel taskListModel) {
-        this.taskListModel = taskListModel;
+    public OverviewWindowModel(DayTaskListControllerFactory itemFactory) {
+        this.itemFactory = itemFactory;
 
-        newActivityComboHolder = new TypedComboBoxModel();
-        newProjectComboHolder = new TypedComboBoxModel();
-        newTaskTagsHolder = new NewTypedValueModel();
-        currentActivityHolder = new LabeledBeanHolder();
-        currentProjectHolder = new LabeledBeanHolder();
-        currentTaskTagsHolder = new TagSetHolder();
-
-        workedTimeHolder = new NewTypedValueModel();
-        currentTaskHolder = new NewTypedValueModel();
+        startDateHolder = new NewTypedValueModel();
+        endDateHolder = new NewTypedValueModel();
+        taskListsHolder = new NewTypedValueModel();
     }
 
-    public TagSetHolder getCurrentTaskTagsHolder() {
-        return currentTaskTagsHolder;
-    }
-
-    public TaskListModel getTaskListModel() {
-        return taskListModel;
-    }
-
-    public LabeledBeanHolder<Activity> getCurrentActivityHolder() {
-        return currentActivityHolder;
-    }
-
-    public LabeledBeanHolder<Project> getCurrentProjectHolder() {
-        return currentProjectHolder;
-    }
-
-    public NewTypedValueModel<Optional<Task>> getCurrentTaskHolder() {
-        return currentTaskHolder;
-    }
-
-    public NewTypedValueModel<String> getWorkedTimeHolder() {
-        return workedTimeHolder;
-    }
+    
 
     @Override
     public Dashboard getDomainBean() {
@@ -145,6 +112,11 @@ public class MainWindowModel implements MVCModel<Dashboard> {
         }
 
         return labels;
+    }
+
+    @Override
+    public void setDomainBean(Overview domainBean) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

@@ -149,7 +149,7 @@ public class DBPersistenceOrchestrator {
         database.startTransaction();
 
         try {
-            return DBPersistenceOrchestrator.this.writeTask(database, task);
+            return writeTask(database, task);
         } finally {
             database.closeTransaction();
         }
@@ -176,6 +176,16 @@ public class DBPersistenceOrchestrator {
             }
 
             writeTask(database, newValue);
+        } finally {
+            database.closeTransaction();
+        }
+    }
+
+    public void removeSingleTask(Database database, Task task) throws DatabaseAccessException {
+        database.startTransaction();
+
+        try {
+            removeTask(database, task);
         } finally {
             database.closeTransaction();
         }

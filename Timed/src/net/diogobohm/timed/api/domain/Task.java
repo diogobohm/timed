@@ -73,8 +73,24 @@ public class Task implements LabeledBean {
 
     @Override
     public String getLabel() {
-        String tags = Tag.buildTagString(getTags());
-        return getActivity().getName() + "@" + getProject().getName() + " " + tags;
+        String tagString = Tag.buildTagString(getTags());
+        StringBuilder labelBuilder = new StringBuilder();
+
+        labelBuilder.append(getActivity().getName()).append("@")
+                .append(getProject().getName()).append(" ")
+                .append(tagString);
+
+        return labelBuilder.toString();
     }
 
+    public static String convertWorkedTimeToString(long workedTime) {
+        long hours = (long) (workedTime / 3600000);
+        long minutes = (long) (workedTime / 60000) % 60;
+
+        if (hours == 0) {
+            return String.format("%dmin", minutes);
+        }
+
+        return String.format("%dh %dmin", hours, minutes);
+    }
 }

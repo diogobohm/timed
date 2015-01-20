@@ -3,11 +3,10 @@
  */
 package net.diogobohm.timed.impl.ui.tasklist;
 
-import com.jgoodies.binding.adapter.Bindings;
 import java.awt.Color;
-import java.awt.GridLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 import net.diogobohm.timed.impl.ui.taskitem.TaskItemController;
@@ -20,10 +19,14 @@ public class TaskListPanel extends JPanel implements MVCView {
 
     private final TaskListModel model;
 
+    public TaskListPanel() {
+        this(new TaskListModel(null));
+    }
+
     public TaskListPanel(TaskListModel model) {
         this.model = model;
         
-        setLayout(new GridLayout(0, 1));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(true);
         setBackground(Color.white);
 

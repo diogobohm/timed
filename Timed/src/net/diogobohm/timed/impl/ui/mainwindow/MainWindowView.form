@@ -50,7 +50,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="dayWorkedTimeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="workedTimeValueLabel" min="-2" pref="46" max="-2" attributes="0"/>
+                      <Component id="workedTimeValueLabel" min="-2" pref="107" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="addEarlierActivityButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
