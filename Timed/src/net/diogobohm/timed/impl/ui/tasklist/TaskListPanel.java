@@ -29,6 +29,7 @@ public class TaskListPanel extends JPanel implements MVCView {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(true);
         setBackground(Color.white);
+        updateTaskItems();
 
         this.model.getTaskItemListHolder().addValueChangeListener(createTaskListChangeListener());
     }
@@ -38,15 +39,19 @@ public class TaskListPanel extends JPanel implements MVCView {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                removeAll();
-
-                for (TaskItemController taskController : model.getTaskItemListHolder().getValue()) {
-                    add(taskController.getView());
-                }
-
-                repaint();
+                updateTaskItems();
             }
         };
 
+    }
+
+    private void updateTaskItems() {
+        removeAll();
+
+        for (TaskItemController taskController : model.getTaskItemListHolder().getValue()) {
+            add(taskController.getView());
+        }
+
+        repaint();
     }
 }

@@ -13,6 +13,13 @@ public class NewTypedValueModel<T> extends AbstractValueModel {
 
     private T value;
 
+    public NewTypedValueModel() {
+    }
+
+    public NewTypedValueModel(T initialValue) {
+        setTypedValue(initialValue);
+    }
+
     @Override
     public T getValue() {
         return value;

@@ -58,8 +58,8 @@ public class Main {
 
         MainWindowController window = new MainWindowController();
 
-        window.showView();
         window.refreshDashBoard();
+        window.showView();
     }
 
     private static Collection<Task> migrateDatabase() {

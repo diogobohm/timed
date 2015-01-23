@@ -7,11 +7,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import javax.swing.Action;
 import javax.swing.JFrame;
 import net.diogobohm.timed.api.db.access.Database;
 import net.diogobohm.timed.api.db.access.DatabaseConnection;
@@ -22,7 +20,10 @@ import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.api.ui.domain.builder.OverviewBuilder;
 import net.diogobohm.timed.api.ui.mvc.controller.DomainEditor;
+import net.diogobohm.timed.impl.ui.factory.DayTaskListControllerFactory;
+import net.diogobohm.timed.impl.ui.overviewwindow.OverviewWindowController;
 import net.diogobohm.timed.impl.ui.tasklist.TaskListController;
 import org.apache.commons.lang3.time.FastDateFormat;
 
@@ -71,7 +72,8 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
     @Override
     protected MainWindowView getView() {
         if (view == null) {
-            view = new MainWindowView(getModel(), taskListController.getView(), createNewTaskAction());
+            view = new MainWindowView(getModel(), taskListController.getView(), createNewTaskAction(),
+                    createShowOverviewAction());
         }
 
         return view;
@@ -81,6 +83,7 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
         Database db = DatabaseConnection.getConnection();
         DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
         String currentDay = DAY_FORMATTER.format(new Date());
+        currentDay = "2011-09-21";
 
         try {
             return orchestrator.loadTasks(db, currentDay + " 00:00", currentDay + " 23:59");
@@ -162,5 +165,18 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
 
         return new Task(currentOpenTask.getActivity(), currentOpenTask.getProject(), currentOpenTask.getStart(),
                 Optional.of(endDate), currentOpenTask.getDescription(), currentOpenTask.getTags());
+    }
+
+    private ActionListener createShowOverviewAction() {
+        return new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OverviewWindowController overview = new OverviewWindowController(new OverviewBuilder(),
+                        new DayTaskListControllerFactory());
+
+                overview.showDefaultOverview();
+            }
+        };
     }
 }

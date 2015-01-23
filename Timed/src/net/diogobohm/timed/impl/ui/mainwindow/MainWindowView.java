@@ -18,14 +18,17 @@ public class MainWindowView extends javax.swing.JFrame implements MVCView {
     private final MainWindowModel model;
     private final TaskListPanel taskListPanel;
     private final ActionListener newTaskAction;
+    private final ActionListener showOverviewAction;
 
     /**
      * Creates new form MainWindow
      */
-    public MainWindowView(MainWindowModel model, TaskListPanel taskListPanel, ActionListener newTaskAction) {
+    public MainWindowView(MainWindowModel model, TaskListPanel taskListPanel, ActionListener newTaskAction,
+            ActionListener showOverviewAction) {
         this.model = model;
         this.taskListPanel = taskListPanel;
         this.newTaskAction = newTaskAction;
+        this.showOverviewAction = showOverviewAction;
 
         initComponents();
     }
@@ -184,7 +187,7 @@ public class MainWindowView extends javax.swing.JFrame implements MVCView {
     }//GEN-LAST:event_newTaskTagsFieldActionPerformed
 
     private void showOverviewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showOverviewButtonActionPerformed
-        // TODO add your handling code here:
+        showOverviewAction.actionPerformed(evt);
     }//GEN-LAST:event_showOverviewButtonActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

@@ -4,69 +4,77 @@
 package net.diogobohm.timed.impl.ui.daytasklist;
 
 import com.google.common.base.Optional;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Date;
 import net.diogobohm.timed.api.ui.mvc.MVCModel;
 import net.diogobohm.timed.api.ui.mvc.model.LabeledBeanHolder;
 import net.diogobohm.timed.api.ui.mvc.model.TaskDateValueHolder;
 import net.diogobohm.timed.api.ui.mvc.model.TypedValueModel;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.api.ui.domain.DayTaskList;
 import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
 
 /**
  *
  * @author diogo.bohm
  */
-public class DayTaskListModel implements MVCModel<Task> {
+public class DayTaskListModel implements MVCModel<DayTaskList> {
 
-    private final TypedValueModel<Optional<Date>> startDateHolder;
-    private final TypedValueModel<Optional<Date>> stopDateHolder;
-    private final LabeledBeanHolder<Task> taskLabelHolder;
-    private final NewTypedValueModel<String> taskElapsedTimeHolder;
-
+    private final NewTypedValueModel<Boolean> expandHolder;
+    private final NewTypedValueModel<String> expandLabelHolder;
+    private final NewTypedValueModel<String> dayWorkedTimeHolder;
+    private final NewTypedValueModel<String> dateNameHolder;
+    
     public DayTaskListModel() {
-        startDateHolder = new TaskDateValueHolder();
-        stopDateHolder = new TaskDateValueHolder();
-        taskLabelHolder = new LabeledBeanHolder();
-        taskElapsedTimeHolder = new NewTypedValueModel();
+        expandHolder = new NewTypedValueModel(Boolean.TRUE);
+        expandLabelHolder = new NewTypedValueModel("\\/");
+        dayWorkedTimeHolder = new NewTypedValueModel();
+        dateNameHolder = new NewTypedValueModel();
+
+        expandHolder.addPropertyChangeListener(createExpandChangeListener());
     }
 
     @Override
-    public Task getDomainBean() {
-        return getTaskLabelHolder().getValue();
+    public DayTaskList getDomainBean() {
+        return null;
     }
 
     @Override
-    public void setDomainBean(Task task) {
-        getStartDateHolder().setValue(Optional.of(task.getStart()));
-        getStopDateHolder().setValue(task.getFinish());
-        getTaskLabelHolder().setTypedValue(task);
-        getTaskElapsedTimeHolder().setTypedValue(Task.convertWorkedTimeToString(getTaskTime(task)));
+    public void setDomainBean(DayTaskList dayTaskList) {
+        getDateNameHolder().setTypedValue(dayTaskList.getDate().toString());
+        getDayWorkedTimeHolder().setTypedValue(String.valueOf(dayTaskList.getTasks().size()));
+        getExpandHolder().setTypedValue(!dayTaskList.getTasks().isEmpty());
     }
 
-    public TypedValueModel getStartDateHolder() {
-        return startDateHolder;
+    protected NewTypedValueModel<Boolean> getExpandHolder() {
+        return expandHolder;
     }
 
-    public TypedValueModel getStopDateHolder() {
-        return stopDateHolder;
+    protected NewTypedValueModel<String> getExpandLabelHolder() {
+        return expandLabelHolder;
     }
 
-    public LabeledBeanHolder<Task> getTaskLabelHolder() {
-        return taskLabelHolder;
+    protected NewTypedValueModel<String> getDayWorkedTimeHolder() {
+        return dayWorkedTimeHolder;
     }
 
-    public NewTypedValueModel<String> getTaskElapsedTimeHolder() {
-        return taskElapsedTimeHolder;
+    protected NewTypedValueModel<String> getDateNameHolder() {
+        return dateNameHolder;
     }
 
-    private long getTaskTime(Task task) {
-        Date startDate = task.getStart();
-        Date endDate = new Date();
-
-        if (task.getFinish().isPresent()) {
-            endDate = task.getFinish().get();
-        }
-
-        return endDate.getTime() - startDate.getTime();
+    protected void toggleExpand() {
+        getExpandHolder().setTypedValue(!getExpandHolder().booleanValue());
     }
+
+    private PropertyChangeListener createExpandChangeListener() {
+        return new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                getExpandLabelHolder().setTypedValue(getExpandHolder().booleanValue() ? "\\/" : ">");
+            }
+        };
+    }
+
 }

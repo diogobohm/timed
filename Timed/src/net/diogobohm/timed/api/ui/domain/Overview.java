@@ -3,9 +3,7 @@
  */
 package net.diogobohm.timed.api.ui.domain;
 
-import java.util.Date;
 import java.util.List;
-import net.diogobohm.timed.api.domain.Task;
 
 /**
  *
@@ -13,14 +11,14 @@ import net.diogobohm.timed.api.domain.Task;
  */
 public class Overview {
 
-    private final List<DayTaskList> workedDays;
+    private final List<DayTaskList> dayTaskLists;
 
-    public Overview(List<DayTaskList> workedDays) {
-        this.workedDays = workedDays;
+    public Overview(List<DayTaskList> dayTaskLists) {
+        this.dayTaskLists = dayTaskLists;
     }
 
-    public List<DayTaskList> getWorkedDays() {
-        return workedDays;
+    public List<DayTaskList> getDayTaskLists() {
+        return dayTaskLists;
     }
 
 }

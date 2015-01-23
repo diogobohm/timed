@@ -3,11 +3,11 @@
  */
 package net.diogobohm.timed.impl.ui.overviewwindow;
 
-import net.diogobohm.timed.impl.ui.mainwindow.*;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -22,8 +22,10 @@ import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.domain.Overview;
+import net.diogobohm.timed.api.ui.domain.builder.OverviewBuilder;
 import net.diogobohm.timed.api.ui.mvc.controller.DomainEditor;
-import net.diogobohm.timed.impl.ui.tasklist.TaskListController;
+import net.diogobohm.timed.impl.ui.factory.DayTaskListControllerFactory;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
 /**
@@ -34,21 +36,29 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
 
     private static final FastDateFormat DAY_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd");
 
+    private final OverviewBuilder overviewBuilder;
+    private final DayTaskListControllerFactory dayTaskListControllerFactory;
+
     private OverviewWindowModel model;
     private OverviewWindowView view;
 
-    public OverviewWindowController(OverviewBuilder overviewBuilder) {
+    public OverviewWindowController(OverviewBuilder overviewBuilder,
+            DayTaskListControllerFactory dayTaskListControllerFactory) {
+        this.overviewBuilder = overviewBuilder;
+        this.dayTaskListControllerFactory = dayTaskListControllerFactory;
     }
 
-    public void showView() {
-        getView().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public void showDefaultOverview() {
+        Overview overview = fetchDefaultOverview();
+
+        getModel().setDomainBean(overview);
         getView().setVisible(true);
     }
 
     @Override
     protected OverviewWindowModel getModel() {
         if (model == null) {
-            model = new OverviewWindowModel();
+            model = new OverviewWindowModel(dayTaskListControllerFactory);
         }
 
         return model;
@@ -63,101 +73,63 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
         return view;
     }
 
-    private Overview fetchDefaultOverview() {
-        Database db = DatabaseConnection.getConnection();
-        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
-        String lastSunday = DAY_FORMATTER.format(getLastSunday());
-        String currentDay = DAY_FORMATTER.format(new Date());
-        List<Task> tasks = Lists.newArrayList();
-
-        try {
-            tasks.addAll(orchestrator.loadTasks(db, lastSunday + " 00:00", currentDay + " 23:59"));
-        } catch (DatabaseAccessException exception) {
-            exception.printStackTrace();
-        }
-
-        return overviewBuilder.buildOverview(tasks);
-    }
-
-    private Collection<Activity> fetchActivities() {
-        Database db = DatabaseConnection.getConnection();
-        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
-
-        try {
-            return orchestrator.loadActivityIndex(db).values();
-        } catch (DatabaseAccessException exception) {
-            exception.printStackTrace();
-        }
-
-        return Lists.newArrayList();
-    }
-
-    private Collection<Project> fetchProjects() {
-        Database db = DatabaseConnection.getConnection();
-        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
-
-        try {
-            return orchestrator.loadProjectIndex(db).values();
-        } catch (DatabaseAccessException exception) {
-            exception.printStackTrace();
-        }
-
-        return Lists.newArrayList();
-    }
-
-    private Dashboard fetchDashboard() {
-        List<Task> todaysTasks = fetchTodaysTasks();
-        Collection<Activity> activities = fetchActivities();
-        Collection<Project> projects = fetchProjects();
-
-        return new Dashboard(todaysTasks, activities, projects);
-    }
-
-    private void writeNewTask(Task newTask) {
-        Database db = DatabaseConnection.getConnection();
-        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
-        Collection<Task> tasksToUpdate = Lists.newArrayList(newTask);
-        Optional<Task> currentTask = model.getCurrentTask();
-
-        if (currentTask.isPresent()) {
-            Task currentFinishedTask = finishCurrentTask(currentTask.get(), newTask);
-
-            tasksToUpdate.add(currentFinishedTask);
-        }
-
-        try {
-            orchestrator.writeTasks(db, tasksToUpdate);
-        } catch (DatabaseAccessException exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    private ActionListener createNewTaskAction() {
+    private ActionListener createFilterAction() {
         return new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Task newTask = getModel().getNewTask();
+                Date startDate = getModel().getStartDate();
+                Date endDate = getModel().getEndDate();
 
-                writeNewTask(newTask);
-                refreshDashBoard();
+                Overview overview = fetchOverviewFor(startDate, endDate);
+                getModel().setDomainBean(overview);
             }
         };
     }
 
-    private Task finishCurrentTask(Task currentOpenTask, Task newTask) {
-        Date endDate = new Date(newTask.getStart().getTime() - 60000);
+    private Overview fetchDefaultOverview() {
+        Date today = new Date();
+        Date lastSunday = getLastSunday(today);
 
-        return new Task(currentOpenTask.getActivity(), currentOpenTask.getProject(), currentOpenTask.getStart(),
-                Optional.of(endDate), currentOpenTask.getDescription(), currentOpenTask.getTags());
+        return fetchOverviewFor(lastSunday, today);
+    }
+
+    private Overview fetchOverviewFor(Date startDate, Date endDate) {
+        List<Task> tasks = fetchTasksBetween(startDate, endDate);
+
+        return overviewBuilder.build(startDate, endDate, tasks);
     }
 
     @Override
     public void updateDomain(Overview oldValue, Overview newValue) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
-    private Object getLastSunday() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private Date getLastSunday(Date start) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+
+        while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+            calendar.setTime(DateUtils.addDays(calendar.getTime(), -1));
+        }
+
+        return calendar.getTime();
+    }
+
+    private List<Task> fetchTasksBetween(Date startDate, Date endDate) {
+        String startDay = DAY_FORMATTER.format(startDate);
+        String endDay = DAY_FORMATTER.format(endDate);
+        List<Task> tasks = Lists.newArrayList();
+
+        Database db = DatabaseConnection.getConnection();
+        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
+
+        try {
+            tasks.addAll(orchestrator.loadTasks(db, startDay + " 00:00", endDay + " 23:59"));
+        } catch (DatabaseAccessException exception) {
+            exception.printStackTrace();
+        }
+
+        return tasks;
     }
 }
