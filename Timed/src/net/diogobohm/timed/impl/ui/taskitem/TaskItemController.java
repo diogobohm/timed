@@ -97,8 +97,6 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
     }
 
     private ActionListener createDeleteTaskAction() {
-        final DomainEditor<Task> caller = this;
-
         return new ActionListener() {
 
             @Override

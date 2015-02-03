@@ -3,9 +3,7 @@
  */
 package net.diogobohm.timed.impl.ui.taskitem.editmenu;
 
-import com.jgoodies.common.swing.MnemonicUtils;
 import java.awt.event.ActionListener;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 

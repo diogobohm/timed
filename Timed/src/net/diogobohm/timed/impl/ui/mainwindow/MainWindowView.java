@@ -5,7 +5,6 @@ package net.diogobohm.timed.impl.ui.mainwindow;
 
 import com.jgoodies.binding.adapter.Bindings;
 import java.awt.event.ActionListener;
-import javax.swing.Action;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 import net.diogobohm.timed.impl.ui.tasklist.TaskListPanel;
 

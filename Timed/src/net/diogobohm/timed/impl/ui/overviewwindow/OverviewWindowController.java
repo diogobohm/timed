@@ -67,7 +67,7 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
     @Override
     protected OverviewWindowView getView() {
         if (view == null) {
-            view = new OverviewWindowView(getModel());
+            view = new OverviewWindowView(getModel(), createFilterAction());
         }
 
         return view;
@@ -83,6 +83,7 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
 
                 Overview overview = fetchOverviewFor(startDate, endDate);
                 getModel().setDomainBean(overview);
+                getModel().setDates(startDate, endDate);
             }
         };
     }
@@ -90,8 +91,11 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
     private Overview fetchDefaultOverview() {
         Date today = new Date();
         Date lastSunday = getLastSunday(today);
+        Overview overview = fetchOverviewFor(lastSunday, today);
 
-        return fetchOverviewFor(lastSunday, today);
+        getModel().setDates(lastSunday, today);
+
+        return overview;
     }
 
     private Overview fetchOverviewFor(Date startDate, Date endDate) {

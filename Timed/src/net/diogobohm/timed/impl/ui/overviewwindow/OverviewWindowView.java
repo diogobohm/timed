@@ -3,12 +3,11 @@
  */
 package net.diogobohm.timed.impl.ui.overviewwindow;
 
+import com.jgoodies.binding.adapter.Bindings;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.BoxLayout;
-import net.diogobohm.timed.api.ui.domain.DayTaskList;
 import net.diogobohm.timed.impl.ui.daytasklist.DayTaskListController;
-import net.diogobohm.timed.impl.ui.taskitem.TaskItemController;
 
 /**
  *
@@ -17,16 +16,19 @@ import net.diogobohm.timed.impl.ui.taskitem.TaskItemController;
 public class OverviewWindowView extends javax.swing.JFrame {
 
     private final OverviewWindowModel model;
+    private final ActionListener filterAction;
 
     /**
      * Creates new form OverviewWindowView
      */
-    public OverviewWindowView(OverviewWindowModel model) {
+    public OverviewWindowView(OverviewWindowModel model, ActionListener filterAction) {
         this.model = model;
+        this.filterAction = filterAction;
 
         initComponents();
 
         this.model.getTaskListsHolder().addPropertyChangeListener(createTaskListChangeAction());
+        updateTaskList();
     }
 
     /**
@@ -37,89 +39,95 @@ public class OverviewWindowView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        dayTaskListPanel = new javax.swing.JPanel();
+        headerPanel = new javax.swing.JPanel();
+        startDayLabel = new javax.swing.JLabel();
+        startDayFilterField = new javax.swing.JTextField();
+        endDayLabel = new javax.swing.JLabel();
+        endDayFilterField = new javax.swing.JTextField();
+        filterButton = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        dayTaskListContainerPanel = new javax.swing.JPanel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(500, 500));
+        setPreferredSize(new java.awt.Dimension(500, 500));
 
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        startDayLabel.setText("From");
 
-        jLabel1.setText("From");
+        startDayFilterField.setText("startDayFilter");
+        Bindings.bind(startDayFilterField, model.getStartDateHolder());
 
-        jTextField1.setText("startDayFilter");
+        endDayLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        endDayLabel.setText("to");
 
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("to");
+        endDayFilterField.setText("endDayFilter");
+        Bindings.bind(endDayFilterField, model.getEndDateHolder());
 
-        jTextField2.setText("endDayFilter");
+        filterButton.setText("Filter");
+        filterButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterButtonActionPerformed(evt);
+            }
+        });
 
-        dayTaskListPanel.setBackground(new java.awt.Color(255, 255, 255));
-        dayTaskListPanel.setLayout(new javax.swing.BoxLayout(dayTaskListPanel, javax.swing.BoxLayout.LINE_AXIS));
-        dayTaskListPanel.setLayout(new BoxLayout(dayTaskListPanel, BoxLayout.PAGE_AXIS));
-        updateTaskList();
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout headerPanelLayout = new javax.swing.GroupLayout(headerPanel);
+        headerPanel.setLayout(headerPanelLayout);
+        headerPanelLayout.setHorizontalGroup(
+            headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(headerPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(dayTaskListPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(startDayLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(dayTaskListPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(startDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(endDayLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(endDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(filterButton, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        headerPanelLayout.setVerticalGroup(
+            headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(headerPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(startDayLabel)
+                    .addComponent(startDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(endDayLabel)
+                    .addComponent(endDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filterButton))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jScrollPane1.setViewportView(jPanel1);
+        getContentPane().add(headerPanel, java.awt.BorderLayout.NORTH);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
-        );
+        jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        dayTaskListContainerPanel.setMaximumSize(new java.awt.Dimension(30000, 30000));
+        dayTaskListContainerPanel.setMinimumSize(new java.awt.Dimension(100, 100));
+        dayTaskListContainerPanel.setPreferredSize(new java.awt.Dimension(100, 100));
+        dayTaskListContainerPanel.setLayout(new javax.swing.BoxLayout(dayTaskListContainerPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        jScrollPane2.setViewportView(dayTaskListContainerPanel);
+
+        getContentPane().add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void filterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterButtonActionPerformed
+        filterAction.actionPerformed(evt);
+    }//GEN-LAST:event_filterButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel dayTaskListPanel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JPanel dayTaskListContainerPanel;
+    private javax.swing.JTextField endDayFilterField;
+    private javax.swing.JLabel endDayLabel;
+    private javax.swing.JButton filterButton;
+    private javax.swing.JPanel headerPanel;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextField startDayFilterField;
+    private javax.swing.JLabel startDayLabel;
     // End of variables declaration//GEN-END:variables
 
     private PropertyChangeListener createTaskListChangeAction() {
@@ -133,12 +141,13 @@ public class OverviewWindowView extends javax.swing.JFrame {
     }
 
     private void updateTaskList() {
-        dayTaskListPanel.removeAll();
+        dayTaskListContainerPanel.removeAll();
 
         for (DayTaskListController taskListController : model.getTaskListsHolder().getValue()) {
-            dayTaskListPanel.add(taskListController.getView());
+            dayTaskListContainerPanel.add(taskListController.getView());
         }
 
-        dayTaskListPanel.repaint();
+        revalidate();
+        repaint();
     }
 }

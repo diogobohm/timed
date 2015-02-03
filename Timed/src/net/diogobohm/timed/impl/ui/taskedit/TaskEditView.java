@@ -5,6 +5,8 @@ package net.diogobohm.timed.impl.ui.taskedit;
 
 import com.jgoodies.binding.adapter.Bindings;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 
 /**
@@ -24,6 +26,9 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
         this.saveAction = saveAction;
 
         initComponents();
+        refreshTaskInCourseField();
+
+        this.model.getTaskInCourseHolder().addPropertyChangeListener(createTaskInCourseChangeListener());
     }
 
     /**
@@ -235,4 +240,24 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
     private javax.swing.JLabel tagsLabel;
     private javax.swing.JTextField tagsTextField;
     // End of variables declaration//GEN-END:variables
+
+    private PropertyChangeListener createTaskInCourseChangeListener() {
+        return new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshTaskInCourseField();
+            }
+        };
+    }
+
+    private void refreshTaskInCourseField() {
+        boolean isTaskInCourse = model.getTaskInCourseHolder().booleanValue();
+
+        if (isTaskInCourse) {
+            stopTimeTextField.setText("");
+        }
+
+        stopTimeTextField.setEnabled(!isTaskInCourse);
+    }
 }

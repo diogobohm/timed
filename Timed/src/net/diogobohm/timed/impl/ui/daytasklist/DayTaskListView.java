@@ -4,8 +4,11 @@
 package net.diogobohm.timed.impl.ui.daytasklist;
 
 import com.jgoodies.binding.adapter.Bindings;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import net.diogobohm.timed.impl.ui.daytasklist.createmenu.TaskItemCreateMenu;
 import net.diogobohm.timed.impl.ui.tasklist.TaskListPanel;
 
 /**
@@ -16,13 +19,17 @@ public class DayTaskListView extends javax.swing.JPanel {
 
     private final DayTaskListModel model;
     private final TaskListPanel taskListPanel;
+    private final ActionListener newTaskAction;
 
-    public DayTaskListView(DayTaskListModel model, TaskListPanel taskListPanel) {
+    public DayTaskListView(DayTaskListModel model, TaskListPanel taskListPanel, ActionListener newTaskAction) {
         this.taskListPanel = taskListPanel;
         this.model = model;
+        this.newTaskAction = newTaskAction;
 
         initComponents();
+
         this.model.getExpandHolder().addPropertyChangeListener(createExpandChangeListener());
+        refreshTaskList();
     }
 
     /**
@@ -34,10 +41,12 @@ public class DayTaskListView extends javax.swing.JPanel {
     private void initComponents() {
 
         headerPanel = new javax.swing.JPanel();
-        workedHoursLabel = new javax.swing.JLabel();
-        dayNameLabel = new javax.swing.JLabel();
         toggleExpandLabel = new javax.swing.JLabel();
-        taskListPanelContainer = new javax.swing.JPanel();
+        dayNameLabel = new javax.swing.JLabel();
+        workedHoursLabel = new javax.swing.JLabel();
+        taskListPanel2 = taskListPanel;
+
+        setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.PAGE_AXIS));
 
         headerPanel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -45,71 +54,59 @@ public class DayTaskListView extends javax.swing.JPanel {
             }
         });
 
-        workedHoursLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        workedHoursLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        workedHoursLabel.setText("DayWorkedHours");
-        Bindings.bind(workedHoursLabel, model.getDayWorkedTimeHolder());
+        toggleExpandLabel.setText(">");
+        Bindings.bind(toggleExpandLabel, model.getExpandLabelHolder());
 
         dayNameLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         dayNameLabel.setText("Day name");
         Bindings.bind(dayNameLabel, model.getDateNameHolder());
 
-        toggleExpandLabel.setText(">");
-        Bindings.bind(toggleExpandLabel, model.getExpandLabelHolder());
+        workedHoursLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        workedHoursLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        workedHoursLabel.setText("DayWorkedHours");
+        Bindings.bind(workedHoursLabel, model.getDayWorkedTimeHolder());
 
         javax.swing.GroupLayout headerPanelLayout = new javax.swing.GroupLayout(headerPanel);
         headerPanel.setLayout(headerPanelLayout);
         headerPanelLayout.setHorizontalGroup(
             headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, headerPanelLayout.createSequentialGroup()
+            .addGroup(headerPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(toggleExpandLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(dayNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                .addComponent(dayNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(workedHoursLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(workedHoursLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         headerPanelLayout.setVerticalGroup(
             headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(headerPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(workedHoursLabel)
-                    .addComponent(dayNameLabel)
-                    .addComponent(toggleExpandLabel)))
+            .addGroup(headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(toggleExpandLabel)
+                .addComponent(dayNameLabel)
+                .addComponent(workedHoursLabel))
         );
 
-        taskListPanelContainer.setPreferredSize(new java.awt.Dimension(0, 0));
-        taskListPanelContainer.setLayout(new java.awt.BorderLayout());
+        add(headerPanel);
 
-        taskListPanelContainer.add(taskListPanel);
-        refreshTaskList();
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(headerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(taskListPanelContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(headerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(taskListPanelContainer, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        taskListPanel2.setOpaque(false);
+        add(taskListPanel2);
     }// </editor-fold>//GEN-END:initComponents
 
     private void headerPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_headerPanelMouseClicked
-        model.toggleExpand();
+        if (evt.getButton() == MouseEvent.BUTTON1) {
+            model.toggleExpand();
+        } else if (evt.getButton() == MouseEvent.BUTTON3) {
+            TaskItemCreateMenu menu = new TaskItemCreateMenu(newTaskAction);
+            menu.show(this, evt.getX(), evt.getY());
+        }
     }//GEN-LAST:event_headerPanelMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dayNameLabel;
     private javax.swing.JPanel headerPanel;
-    private javax.swing.JPanel taskListPanelContainer;
+    private javax.swing.JPanel taskListPanel2;
     private javax.swing.JLabel toggleExpandLabel;
     private javax.swing.JLabel workedHoursLabel;
     // End of variables declaration//GEN-END:variables
@@ -127,11 +124,10 @@ public class DayTaskListView extends javax.swing.JPanel {
     private void refreshTaskList() {
         boolean expand = model.getExpandHolder().booleanValue();
 
-        taskListPanelContainer.removeAll();
-        taskListPanelContainer.setSize(0, 0);
+        remove(taskListPanel);
 
         if (expand) {
-            taskListPanelContainer.add(taskListPanel);
+            add(taskListPanel);
         }
 
         revalidate();

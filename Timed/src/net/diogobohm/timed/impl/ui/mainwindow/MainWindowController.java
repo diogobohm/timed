@@ -83,7 +83,6 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
         Database db = DatabaseConnection.getConnection();
         DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
         String currentDay = DAY_FORMATTER.format(new Date());
-        currentDay = "2011-09-21";
 
         try {
             return orchestrator.loadTasks(db, currentDay + " 00:00", currentDay + " 23:59");

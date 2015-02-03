@@ -3,27 +3,14 @@
  */
 package net.diogobohm.timed.impl.ui.overviewwindow;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.diogobohm.timed.api.domain.Activity;
-import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.ui.mvc.MVCModel;
-import net.diogobohm.timed.api.ui.domain.Dashboard;
-import net.diogobohm.timed.api.domain.Tag;
-import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.domain.DayTaskList;
 import net.diogobohm.timed.api.ui.domain.Overview;
 import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
-import net.diogobohm.timed.api.ui.mvc.model.TypedComboBoxModel;
-import net.diogobohm.timed.api.ui.mvc.model.bean.LabeledBean;
 import net.diogobohm.timed.impl.ui.daytasklist.DayTaskListController;
 import net.diogobohm.timed.impl.ui.factory.DayTaskListControllerFactory;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -46,7 +33,7 @@ public class OverviewWindowModel implements MVCModel<Overview> {
 
         startDateHolder = new NewTypedValueModel();
         endDateHolder = new NewTypedValueModel();
-        taskListsHolder = new NewTypedValueModel();
+        taskListsHolder = new NewTypedValueModel(Lists.newArrayList());
     }
 
     @Override
@@ -79,6 +66,11 @@ public class OverviewWindowModel implements MVCModel<Overview> {
         }
 
         return new Date();
+    }
+
+    public void setDates(Date startDate, Date endDate) {
+        getStartDateHolder().setTypedValue(DAY_FORMATTER.format(startDate));
+        getEndDateHolder().setTypedValue(DAY_FORMATTER.format(endDate));
     }
 
     protected NewTypedValueModel<String> getStartDateHolder() {

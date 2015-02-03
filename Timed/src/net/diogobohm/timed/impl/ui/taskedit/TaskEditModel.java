@@ -5,7 +5,6 @@ package net.diogobohm.timed.impl.ui.taskedit;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -17,8 +16,6 @@ import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.mvc.model.LabeledBeanComboBoxModel;
 import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
 import net.diogobohm.timed.api.ui.mvc.model.TypedComboBoxModel;
-import net.diogobohm.timed.api.ui.mvc.model.TypedValueHolder;
-import net.diogobohm.timed.api.ui.mvc.model.TypedValueModel;
 import net.diogobohm.timed.api.ui.mvc.model.bean.LabeledBean;
 import org.apache.commons.lang3.time.FastDateFormat;
 
