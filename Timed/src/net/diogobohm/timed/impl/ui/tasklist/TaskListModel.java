@@ -6,6 +6,7 @@ package net.diogobohm.timed.impl.ui.tasklist;
 import com.google.common.collect.Lists;
 import java.util.List;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.api.ui.domain.TaskList;
 import net.diogobohm.timed.api.ui.mvc.MVCModel;
 import net.diogobohm.timed.api.ui.mvc.model.TypedValueHolder;
 import net.diogobohm.timed.api.ui.mvc.model.TypedValueModel;
@@ -16,11 +17,10 @@ import net.diogobohm.timed.impl.ui.taskitem.TaskItemController;
  *
  * @author diogo.bohm
  */
-public class TaskListModel implements MVCModel<List<Task>> {
+public class TaskListModel implements MVCModel<TaskList> {
 
     private final TaskItemControllerFactory itemFactory;
     private final TypedValueModel<List<TaskItemController>> taskItemListHolder;
-
 
     public TaskListModel(TaskItemControllerFactory itemFactory) {
         this.itemFactory = itemFactory;
@@ -32,13 +32,16 @@ public class TaskListModel implements MVCModel<List<Task>> {
     }
 
     @Override
-    public List<Task> getDomainBean() {
-        return extractTasks(getTaskItemListHolder().getValue());
+    public TaskList getDomainBean() {
+        List<Task> tasks = extractTasks(getTaskItemListHolder().getValue());
+
+        return new TaskList(tasks);
     }
 
     @Override
-    public void setDomainBean(List<Task> domainBean) {
-        List<TaskItemController> controllers = itemFactory.createTaskItemControllers(domainBean);
+    public void setDomainBean(TaskList domainBean) {
+        List<Task> tasks = domainBean.getTasks();
+        List<TaskItemController> controllers = itemFactory.createTaskItemControllers(tasks);
         
         getTaskItemListHolder().setValue(controllers);
     }

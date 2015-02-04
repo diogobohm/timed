@@ -20,6 +20,7 @@ import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.api.ui.domain.TaskList;
 import net.diogobohm.timed.api.ui.domain.builder.OverviewBuilder;
 import net.diogobohm.timed.api.ui.mvc.controller.DomainEditor;
 import net.diogobohm.timed.impl.ui.factory.DayTaskListControllerFactory;
@@ -56,7 +57,7 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
     }
 
     @Override
-    public void updateDomain(Task oldValue, Task newValue) {
+    public void updateDomain(Optional<Task> oldValue, Optional<Task> newValue) {
         refreshDashBoard();
     }
 
@@ -79,18 +80,20 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
         return view;
     }
 
-    private List<Task> fetchTodaysTasks() {
+    private TaskList fetchTodaysTasks() {
         Database db = DatabaseConnection.getConnection();
         DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
         String currentDay = DAY_FORMATTER.format(new Date());
 
         try {
-            return orchestrator.loadTasks(db, currentDay + " 00:00", currentDay + " 23:59");
+            List<Task> tasks = orchestrator.loadTasks(db, currentDay + " 00:00", currentDay + " 23:59");
+
+            return new TaskList(tasks);
         } catch (DatabaseAccessException exception) {
             exception.printStackTrace();
         }
 
-        return Lists.newArrayList();
+        return new TaskList(Lists.<Task>newArrayList());
     }
 
     private Collection<Activity> fetchActivities() {
@@ -120,7 +123,7 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
     }
 
     private Dashboard fetchDashboard() {
-        List<Task> todaysTasks = fetchTodaysTasks();
+        TaskList todaysTasks = fetchTodaysTasks();
         Collection<Activity> activities = fetchActivities();
         Collection<Project> projects = fetchProjects();
 

@@ -3,6 +3,7 @@
  */
 package net.diogobohm.timed.api.db.serializer;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -145,16 +146,6 @@ public class DBPersistenceOrchestrator {
         return taskTags;
     }
 
-    public Integer writeSingleTask(Database database, Task task) throws DatabaseAccessException {
-        database.startTransaction();
-
-        try {
-            return writeTask(database, task);
-        } finally {
-            database.closeTransaction();
-        }
-    }
-
     public void writeTasks(Database database, Collection<Task> tasks) throws DatabaseAccessException {
         database.startTransaction();
 
@@ -167,12 +158,16 @@ public class DBPersistenceOrchestrator {
         }
     }
 
-    public void writeTask(Database database, Task oldValue, Task newValue) throws DatabaseAccessException {
+    public void writeTask(Database database, Optional<Task> oldValue, Task newValue) throws DatabaseAccessException {
         database.startTransaction();
 
         try {
-            if (taskCodec.indexChanged(oldValue, newValue)) {
-                removeTask(database, oldValue);
+            if (oldValue.isPresent()) {
+                Task oldTask = oldValue.get();
+
+                if (taskCodec.indexChanged(oldTask, newValue)) {
+                    removeTask(database, oldTask);
+                }
             }
 
             writeTask(database, newValue);
@@ -277,7 +272,7 @@ public class DBPersistenceOrchestrator {
 
     private <T extends DatabaseObject> List<T> loadObjects(Database database, DBObjectConfiguration configuration) throws DatabaseAccessException {
         List<T> objectList;
-        
+
         database.startTransaction();
         objectList = database.loadObjects(configuration);
         database.closeTransaction();

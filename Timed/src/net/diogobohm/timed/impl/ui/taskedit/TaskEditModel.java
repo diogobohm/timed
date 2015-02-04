@@ -27,7 +27,7 @@ public class TaskEditModel {
 
     private static final FastDateFormat DATETIME_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd HH:mm");
 
-    private final NewTypedValueModel<Task> originalTaskHolder;
+    private final NewTypedValueModel<Optional<Task>> originalTaskHolder;
     private final TypedComboBoxModel<String> activityHolder;
     private final TypedComboBoxModel<String> projectHolder;
     private final NewTypedValueModel<String> tagExpressionHolder;
@@ -70,31 +70,22 @@ public class TaskEditModel {
         return new Task(new Activity(activityName), new Project(projectName), startTask, stopTask, description, tagSet);
     }
 
-    public Task getOriginalTask() {
+    public Optional<Task> getOriginalTask() {
         return getOriginalTaskHolder().getValue();
     }
 
     public void setDomainBean(List<Activity> activities, List<Project> projects, Task task) throws ParseException {
-        getOriginalTaskHolder().setTypedValue(task);
-
         getActivityHolder().resetElementList(buildLabels(activities));
-        getActivityHolder().setSelectedItem(task.getActivity().getLabel());
-
         getProjectHolder().resetElementList(buildLabels(projects));
-        getProjectHolder().setSelectedItem(task.getProject().getLabel());
 
-        getTagExpressionHolder().setTypedValue(Tag.buildTagString(task.getTags()));
-        getStartDateTextHolder().setTypedValue(extractDateFromDate(task.getStart()));
-        getStartTimeTextHolder().setTypedValue(extractTimeFromDate(task.getStart()));
+        setTaskData(task);
+    }
 
-        if (task.getFinish().isPresent()) {
-            getStopTimeTextHolder().setTypedValue(extractTimeFromDate(task.getFinish().get()));
-            getTaskInCourseHolder().setTypedValue(Boolean.FALSE);
-        } else {
-            getTaskInCourseHolder().setTypedValue(Boolean.TRUE);
-        }
+    public void setDomainBean(List<Activity> activities, List<Project> projects, Date initialDate) throws ParseException {
+        getActivityHolder().resetElementList(buildLabels(activities));
+        getProjectHolder().resetElementList(buildLabels(projects));
 
-        getDescriptionHolder().setTypedValue(task.getDescription());
+        setDefaultData(initialDate);
     }
 
     protected TypedComboBoxModel<String> getActivityHolder() {
@@ -129,6 +120,43 @@ public class TaskEditModel {
         return descriptionHolder;
     }
 
+    private void setTaskData(Task task) {
+        getOriginalTaskHolder().setTypedValue(Optional.of(task));
+        getActivityHolder().setSelectedItem(task.getActivity().getLabel());
+
+        getProjectHolder().setSelectedItem(task.getProject().getLabel());
+
+        getTagExpressionHolder().setTypedValue(Tag.buildTagString(task.getTags()));
+        getStartDateTextHolder().setTypedValue(extractDateFromDate(task.getStart()));
+        getStartTimeTextHolder().setTypedValue(extractTimeFromDate(task.getStart()));
+
+        if (task.getFinish().isPresent()) {
+            getStopTimeTextHolder().setTypedValue(extractTimeFromDate(task.getFinish().get()));
+            getTaskInCourseHolder().setTypedValue(Boolean.FALSE);
+        } else {
+            getTaskInCourseHolder().setTypedValue(Boolean.TRUE);
+        }
+
+        getDescriptionHolder().setTypedValue(task.getDescription());
+    }
+
+    private void setDefaultData(Date initialDate) {
+        String defaultValue = "";
+
+        getOriginalTaskHolder().setTypedValue(Optional.<Task>absent());
+        getActivityHolder().setSelectedItem(null);
+        getProjectHolder().setSelectedItem(null);
+
+        getTagExpressionHolder().setTypedValue(defaultValue);
+        getStartDateTextHolder().setTypedValue(extractDateFromDate(initialDate));
+        getStartTimeTextHolder().setTypedValue(extractTimeFromDate(initialDate));
+
+        getTaskInCourseHolder().setTypedValue(Boolean.FALSE);
+        getStopTimeTextHolder().setTypedValue(extractTimeFromDate(initialDate));
+
+        getDescriptionHolder().setTypedValue(defaultValue);
+    }
+
     private String extractDateFromDate(Date date) {
         String dateTime = DATETIME_FORMATTER.format(date);
         String[] dateChunks = dateTime.split(" ");
@@ -153,8 +181,7 @@ public class TaskEditModel {
         return labels;
     }
 
-    private NewTypedValueModel<Task> getOriginalTaskHolder() {
+    private NewTypedValueModel<Optional<Task>> getOriginalTaskHolder() {
         return originalTaskHolder;
     }
-
 }

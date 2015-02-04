@@ -4,21 +4,14 @@
 package net.diogobohm.timed.impl.ui.daytasklist;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
-import java.util.Set;
-import net.diogobohm.timed.api.db.access.Database;
-import net.diogobohm.timed.api.db.access.DatabaseConnection;
-import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
-import net.diogobohm.timed.api.db.serializer.DBPersistenceOrchestrator;
-import net.diogobohm.timed.api.domain.Activity;
-import net.diogobohm.timed.api.domain.Project;
-import net.diogobohm.timed.api.domain.Tag;
+import java.util.List;
 import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.ui.domain.DayTaskList;
+import net.diogobohm.timed.api.ui.domain.TaskList;
 import net.diogobohm.timed.api.ui.mvc.controller.DomainEditor;
 import net.diogobohm.timed.impl.ui.taskedit.TaskEditController;
 import net.diogobohm.timed.impl.ui.tasklist.TaskListController;
@@ -57,22 +50,24 @@ public class DayTaskListController extends MVCController<DayTaskListModel, DayTa
     }
 
     public void setDomain(DayTaskList dayTaskList) {
-        taskListController.setTasks(dayTaskList.getTasks());
+        taskListController.setTasks(dayTaskList.getTaskList());
         getModel().setDomainBean(dayTaskList);
     }
 
     @Override
-    public void updateDomain(Task oldValue, Task newValue) {
-        Database db = DatabaseConnection.getConnection();
-        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
+    public void updateDomain(Optional<Task> oldValue, Optional<Task> newValue) {
+        DayTaskList currentDay = getModel().getDomainBean();
+        TaskList taskList = currentDay.getTaskList();
 
-        try {
-            orchestrator.writeSingleTask(db, newValue);
-        } catch (DatabaseAccessException exception) {
-            exception.printStackTrace();
+        if (oldValue.isPresent()) {
+            taskList.removeTask(oldValue.get());
         }
 
-        // Make it refresh the context.
+        if (newValue.isPresent()) {
+            taskList.addTask(newValue.get());
+        }
+
+        setDomain(currentDay);
     }
 
     private ActionListener createNewTaskAction() {
@@ -83,11 +78,9 @@ public class DayTaskListController extends MVCController<DayTaskListModel, DayTa
             @Override
             public void actionPerformed(ActionEvent e) {
                 Date date = model.getDay();
-                Set<Tag> tags = Sets.newHashSet();
-                Task task = new Task(new Activity(""), new Project(""), date, Optional.of(date), "", tags);
-
+                
                 TaskEditController editor = new TaskEditController(caller);
-                editor.editTask(task);
+                editor.newTask(date);
             }
         };
     }

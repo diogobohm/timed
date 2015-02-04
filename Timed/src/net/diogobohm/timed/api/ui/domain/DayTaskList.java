@@ -4,8 +4,6 @@
 package net.diogobohm.timed.api.ui.domain;
 
 import java.util.Date;
-import java.util.List;
-import net.diogobohm.timed.api.domain.Task;
 
 /**
  *
@@ -14,9 +12,9 @@ import net.diogobohm.timed.api.domain.Task;
 public class DayTaskList {
 
     private final Date date;
-    private final List<Task> tasks;
+    private final TaskList tasks;
 
-    public DayTaskList(Date date, List<Task> tasks) {
+    public DayTaskList(Date date, TaskList tasks) {
         this.date = date;
         this.tasks = tasks;
     }
@@ -25,7 +23,7 @@ public class DayTaskList {
         return date;
     }
 
-    public List<Task> getTasks() {
+    public TaskList getTaskList() {
         return tasks;
     }
 

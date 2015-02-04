@@ -6,9 +6,14 @@ package net.diogobohm.timed.impl.ui.daytasklist;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
+import javax.swing.ImageIcon;
+import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.mvc.MVCModel;
 import net.diogobohm.timed.api.ui.domain.DayTaskList;
+import net.diogobohm.timed.api.ui.domain.TaskList;
+import net.diogobohm.timed.api.ui.image.ImageResource;
 import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 /**
  *
@@ -16,15 +21,19 @@ import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
  */
 public class DayTaskListModel implements MVCModel<DayTaskList> {
 
+    private static final FastDateFormat DATE_NAME_FORMATTER = FastDateFormat.getInstance("EEEE, MMMM d, yyyy");
+
+    private final NewTypedValueModel<DayTaskList> currentDayHolder;
     private final NewTypedValueModel<Boolean> expandHolder;
-    private final NewTypedValueModel<String> expandLabelHolder;
+    private final NewTypedValueModel<ImageResource> expandLabelHolder;
     private final NewTypedValueModel<String> dayWorkedTimeHolder;
     private final NewTypedValueModel<String> dateNameHolder;
     private final NewTypedValueModel<Date> dateHolder;
     
     public DayTaskListModel() {
+        currentDayHolder = new NewTypedValueModel();
         expandHolder = new NewTypedValueModel(Boolean.TRUE);
-        expandLabelHolder = new NewTypedValueModel("\\/");
+        expandLabelHolder = new NewTypedValueModel(ImageResource.ICON_COLLAPSE);
         dayWorkedTimeHolder = new NewTypedValueModel();
         dateNameHolder = new NewTypedValueModel();
         dateHolder = new NewTypedValueModel();
@@ -34,22 +43,30 @@ public class DayTaskListModel implements MVCModel<DayTaskList> {
 
     @Override
     public DayTaskList getDomainBean() {
-        return null;
+        return getCurrentDayHolder().getValue();
     }
 
     @Override
     public void setDomainBean(DayTaskList dayTaskList) {
+        TaskList taskList = dayTaskList.getTaskList();
+
+        getCurrentDayHolder().setTypedValue(dayTaskList);
+
         getDateHolder().setTypedValue(dayTaskList.getDate());
-        getDateNameHolder().setTypedValue(dayTaskList.getDate().toString());
-        getDayWorkedTimeHolder().setTypedValue(String.valueOf(dayTaskList.getTasks().size()));
-        getExpandHolder().setTypedValue(!dayTaskList.getTasks().isEmpty());
+        getDateNameHolder().setTypedValue(DATE_NAME_FORMATTER.format(dayTaskList.getDate()));
+        getDayWorkedTimeHolder().setTypedValue(Task.convertWorkedTimeToString(taskList.getWorkedTime()));
+        getExpandHolder().setTypedValue(!taskList.getTasks().isEmpty());
+    }
+
+    protected NewTypedValueModel<DayTaskList> getCurrentDayHolder() {
+        return currentDayHolder;
     }
 
     protected NewTypedValueModel<Boolean> getExpandHolder() {
         return expandHolder;
     }
 
-    protected NewTypedValueModel<String> getExpandLabelHolder() {
+    protected NewTypedValueModel<ImageResource> getExpandLabelHolder() {
         return expandLabelHolder;
     }
 
@@ -78,7 +95,13 @@ public class DayTaskListModel implements MVCModel<DayTaskList> {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                getExpandLabelHolder().setTypedValue(getExpandHolder().booleanValue() ? "\\/" : ">");
+                ImageResource newImage = ImageResource.ICON_EXPAND;
+
+                if (getExpandHolder().booleanValue()) {
+                    newImage = ImageResource.ICON_EXPAND;
+                }
+
+                getExpandLabelHolder().setTypedValue(newImage);
             }
         };
     }

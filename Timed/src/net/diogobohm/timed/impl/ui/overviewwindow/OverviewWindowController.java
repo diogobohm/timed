@@ -8,18 +8,13 @@ import com.google.common.collect.Lists;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import javax.swing.JFrame;
 import net.diogobohm.timed.api.db.access.Database;
 import net.diogobohm.timed.api.db.access.DatabaseConnection;
 import net.diogobohm.timed.api.db.exception.DatabaseAccessException;
 import net.diogobohm.timed.api.db.serializer.DBPersistenceOrchestrator;
-import net.diogobohm.timed.api.domain.Activity;
-import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
-import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.domain.Overview;
 import net.diogobohm.timed.api.ui.domain.builder.OverviewBuilder;
@@ -105,7 +100,7 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
     }
 
     @Override
-    public void updateDomain(Overview oldValue, Overview newValue) {
+    public void updateDomain(Optional<Overview> oldValue, Optional<Overview> newValue) {
         
     }
 

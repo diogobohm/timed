@@ -17,6 +17,7 @@ import net.diogobohm.timed.api.ui.mvc.model.TagSetHolder;
 import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Tag;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.api.ui.domain.TaskList;
 import net.diogobohm.timed.api.ui.mvc.model.LabeledBeanHolder;
 import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
 import net.diogobohm.timed.api.ui.mvc.model.TypedComboBoxModel;
@@ -102,15 +103,17 @@ public class MainWindowModel implements MVCModel<Dashboard> {
 
     @Override
     public void setDomainBean(Dashboard domainBean) {
-        Optional<Task> currentTask = domainBean.getCurrentTask();
+        TaskList taskList = domainBean.getTaskList();
+
+        Optional<Task> currentTask = taskList.getCurrentTask();
 
         getCurrentTaskHolder().setTypedValue(currentTask);
-        getTaskListModel().setDomainBean(domainBean.getTasks());
+        getTaskListModel().setDomainBean(taskList);
 
         getNewActivityComboHolder().resetElementList(buildLabels(domainBean.getActivities()));
         getNewProjectComboHolder().resetElementList(buildLabels(domainBean.getProjects()));
 
-        getWorkedTimeHolder().setTypedValue(Task.convertWorkedTimeToString(domainBean.getWorkedTime()));
+        getWorkedTimeHolder().setTypedValue(Task.convertWorkedTimeToString(taskList.getWorkedTime()));
 
         if (currentTask.isPresent()) {
             Task task = currentTask.get();

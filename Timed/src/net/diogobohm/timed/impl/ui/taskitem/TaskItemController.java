@@ -3,6 +3,7 @@
  */
 package net.diogobohm.timed.impl.ui.taskitem;
 
+import com.google.common.base.Optional;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import net.diogobohm.timed.api.db.access.Database;
@@ -56,18 +57,12 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
     }
 
     @Override
-    public void updateDomain(Task oldValue, Task newValue) {
-        Database db = DatabaseConnection.getConnection();
-        DBPersistenceOrchestrator orchestrator = DBPersistenceOrchestrator.getInstance();
-
-        try {
-            orchestrator.writeTask(db, oldValue, newValue);
-        } catch (DatabaseAccessException exception) {
-            exception.printStackTrace();
-        }
-
-        setTask(newValue);
+    public void updateDomain(Optional<Task> oldValue, Optional<Task> newValue) {
         dashboardEditor.updateDomain(oldValue, newValue);
+
+        if (newValue.isPresent()) {
+            setTask(newValue.get());
+        }
     }
 
     private void deleteDomain(Task taskToDelete) {
@@ -76,11 +71,10 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
 
         try {
             orchestrator.removeSingleTask(db, taskToDelete);
+            dashboardEditor.updateDomain(Optional.of(taskToDelete), Optional.<Task>absent());
         } catch (DatabaseAccessException exception) {
             exception.printStackTrace();
         }
-
-        dashboardEditor.updateDomain(taskToDelete, null);
     }
 
     private ActionListener createEditTaskAction() {

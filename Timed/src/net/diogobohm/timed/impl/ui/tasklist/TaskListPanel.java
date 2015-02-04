@@ -52,6 +52,7 @@ public class TaskListPanel extends javax.swing.JPanel {
             add(taskController.getView());
         }
 
+        revalidate();
         repaint();
     }
 

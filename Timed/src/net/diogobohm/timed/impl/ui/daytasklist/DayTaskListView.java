@@ -8,6 +8,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.ImageIcon;
+import net.diogobohm.timed.api.ui.image.ImageLoader;
+import net.diogobohm.timed.api.ui.image.ImageResource;
 import net.diogobohm.timed.impl.ui.daytasklist.createmenu.TaskItemCreateMenu;
 import net.diogobohm.timed.impl.ui.tasklist.TaskListPanel;
 
@@ -55,7 +58,6 @@ public class DayTaskListView extends javax.swing.JPanel {
         });
 
         toggleExpandLabel.setText(">");
-        Bindings.bind(toggleExpandLabel, model.getExpandLabelHolder());
 
         dayNameLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         dayNameLabel.setText("Day name");
@@ -70,21 +72,24 @@ public class DayTaskListView extends javax.swing.JPanel {
         headerPanel.setLayout(headerPanelLayout);
         headerPanelLayout.setHorizontalGroup(
             headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(headerPanelLayout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, headerPanelLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
                 .addComponent(toggleExpandLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(dayNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(dayNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(workedHoursLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         headerPanelLayout.setVerticalGroup(
             headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(toggleExpandLabel)
-                .addComponent(dayNameLabel)
-                .addComponent(workedHoursLabel))
+            .addGroup(headerPanelLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addGroup(headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(workedHoursLabel)
+                    .addComponent(dayNameLabel)
+                    .addComponent(toggleExpandLabel))
+                .addGap(5, 5, 5))
         );
 
         add(headerPanel);
@@ -123,14 +128,23 @@ public class DayTaskListView extends javax.swing.JPanel {
 
     private void refreshTaskList() {
         boolean expand = model.getExpandHolder().booleanValue();
-
+        
         remove(taskListPanel);
 
         if (expand) {
             add(taskListPanel);
         }
 
+        refreshExpandIcon();
+
         revalidate();
         repaint();
+    }
+
+    private void refreshExpandIcon() {
+        ImageResource resource = model.getExpandLabelHolder().getValue();
+        ImageIcon icon = ImageLoader.getInstance().getIcon(resource);
+
+        toggleExpandLabel.setIcon(icon);
     }
 }

@@ -3,8 +3,8 @@
  */
 package net.diogobohm.timed.impl.ui.tasklist;
 
-import java.util.List;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.api.ui.domain.TaskList;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.ui.mvc.controller.DomainEditor;
 import net.diogobohm.timed.impl.ui.factory.TaskItemControllerFactory;
@@ -24,8 +24,8 @@ public class TaskListController extends MVCController<TaskListModel, TaskListPan
         itemFactory = new TaskItemControllerFactory(dashboardEditor);
     }
 
-    public void setTasks(List<Task> tasks) {
-        getModel().setDomainBean(tasks);
+    public void setTasks(TaskList taskList) {
+        getModel().setDomainBean(taskList);
     }
 
     @Override
