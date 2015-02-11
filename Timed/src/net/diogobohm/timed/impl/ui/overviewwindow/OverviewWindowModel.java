@@ -4,6 +4,7 @@
 package net.diogobohm.timed.impl.ui.overviewwindow;
 
 import com.google.common.collect.Lists;
+import java.awt.Window;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +20,7 @@ import org.apache.commons.lang3.time.FastDateFormat;
  *
  * @author diogo.bohm
  */
-public class OverviewWindowModel implements MVCModel<Overview> {
+public class OverviewWindowModel {
 
     private static final FastDateFormat DAY_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd");
 
@@ -36,16 +37,10 @@ public class OverviewWindowModel implements MVCModel<Overview> {
         taskListsHolder = new NewTypedValueModel(Lists.newArrayList());
     }
 
-    @Override
-    public void setDomainBean(Overview domainBean) {
-        List<DayTaskListController> controllers = createDayTaskListControllers(domainBean.getDayTaskLists());
+    public void setDomainBean(Window owner, Overview domainBean) {
+        List<DayTaskListController> controllers = createDayTaskListControllers(owner, domainBean.getDayTaskLists());
 
         getTaskListsHolder().setTypedValue(controllers);
-    }
-
-    @Override
-    public Overview getDomainBean() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public Date getStartDate() {
@@ -85,8 +80,8 @@ public class OverviewWindowModel implements MVCModel<Overview> {
         return taskListsHolder;
     }
 
-    private List<DayTaskListController> createDayTaskListControllers(List<DayTaskList> dayTaskLists) {
-        return itemFactory.createControllers(dayTaskLists);
+    private List<DayTaskListController> createDayTaskListControllers(Window owner, List<DayTaskList> dayTaskLists) {
+        return itemFactory.createControllers(owner, dayTaskLists);
     }
 
 }

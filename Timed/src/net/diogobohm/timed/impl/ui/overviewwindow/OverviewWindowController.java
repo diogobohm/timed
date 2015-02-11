@@ -37,16 +37,15 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
     private OverviewWindowModel model;
     private OverviewWindowView view;
 
-    public OverviewWindowController(OverviewBuilder overviewBuilder,
-            DayTaskListControllerFactory dayTaskListControllerFactory) {
-        this.overviewBuilder = overviewBuilder;
-        this.dayTaskListControllerFactory = dayTaskListControllerFactory;
+    public OverviewWindowController() {
+        this.overviewBuilder = new OverviewBuilder();
+        this.dayTaskListControllerFactory = new DayTaskListControllerFactory();
     }
 
     public void showDefaultOverview() {
         Overview overview = fetchDefaultOverview();
 
-        getModel().setDomainBean(overview);
+        getModel().setDomainBean(getView(), overview);
         getView().setVisible(true);
     }
 
@@ -77,7 +76,7 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
                 Date endDate = getModel().getEndDate();
 
                 Overview overview = fetchOverviewFor(startDate, endDate);
-                getModel().setDomainBean(overview);
+                getModel().setDomainBean(getView(), overview);
                 getModel().setDates(startDate, endDate);
             }
         };

@@ -3,6 +3,7 @@
  */
 package net.diogobohm.timed.impl.ui.tasklist;
 
+import java.awt.Window;
 import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.domain.TaskList;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
@@ -19,9 +20,14 @@ public class TaskListController extends MVCController<TaskListModel, TaskListPan
 
     private TaskListModel model;
     private TaskListPanel view;
+    private Window owner;
 
     public TaskListController(DomainEditor<Task> dashboardEditor) {
         itemFactory = new TaskItemControllerFactory(dashboardEditor);
+    }
+
+    public void setOwner(Window owner) {
+        getModel().setOwner(owner);
     }
 
     public void setTasks(TaskList taskList) {

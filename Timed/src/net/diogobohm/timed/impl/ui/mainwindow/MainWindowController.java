@@ -21,9 +21,7 @@ import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.ui.domain.Dashboard;
 import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.domain.TaskList;
-import net.diogobohm.timed.api.ui.domain.builder.OverviewBuilder;
 import net.diogobohm.timed.api.ui.mvc.controller.DomainEditor;
-import net.diogobohm.timed.impl.ui.factory.DayTaskListControllerFactory;
 import net.diogobohm.timed.impl.ui.overviewwindow.OverviewWindowController;
 import net.diogobohm.timed.impl.ui.tasklist.TaskListController;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -174,8 +172,7 @@ public class MainWindowController extends MVCController<MainWindowModel, MainWin
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                OverviewWindowController overview = new OverviewWindowController(new OverviewBuilder(),
-                        new DayTaskListControllerFactory());
+                OverviewWindowController overview = new OverviewWindowController();
 
                 overview.showDefaultOverview();
             }

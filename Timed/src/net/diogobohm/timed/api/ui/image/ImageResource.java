@@ -10,7 +10,8 @@ package net.diogobohm.timed.api.ui.image;
 public enum ImageResource {
 
     ICON_EXPAND("icon_expand.png"),
-    ICON_COLLAPSE("icon_collapse.png");
+    ICON_COLLAPSE("icon_collapse.png"),
+    ICON_WINDOW("icon_window.png");
 
     private final String filename;
 

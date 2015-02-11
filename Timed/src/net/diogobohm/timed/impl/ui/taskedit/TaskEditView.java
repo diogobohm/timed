@@ -4,16 +4,20 @@
 package net.diogobohm.timed.impl.ui.taskedit;
 
 import com.jgoodies.binding.adapter.Bindings;
+import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import net.diogobohm.timed.api.ui.image.ImageLoader;
+import net.diogobohm.timed.api.ui.image.ImageResource;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 
 /**
  *
  * @author diogo.bohm
  */
-public class TaskEditView extends javax.swing.JFrame implements MVCView {
+public class TaskEditView extends javax.swing.JDialog implements MVCView {
 
     private final TaskEditModel model;
     private final ActionListener saveAction;
@@ -21,14 +25,21 @@ public class TaskEditView extends javax.swing.JFrame implements MVCView {
     /**
      * Creates new form TaskEditView
      */
-    public TaskEditView(TaskEditModel model, ActionListener saveAction) {
+    public TaskEditView(Window owner, TaskEditModel model, ActionListener saveAction) {
+        super(owner);
+
         this.model = model;
         this.saveAction = saveAction;
 
+        setIconImage(getWindowIcon());
         initComponents();
         refreshTaskInCourseField();
 
         this.model.getTaskInCourseHolder().addPropertyChangeListener(createTaskInCourseChangeListener());
+    }
+
+    private Image getWindowIcon() {
+        return ImageLoader.getInstance().getIcon(ImageResource.ICON_WINDOW).getImage();
     }
 
     /**

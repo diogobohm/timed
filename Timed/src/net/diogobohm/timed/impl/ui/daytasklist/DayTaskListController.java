@@ -4,10 +4,10 @@
 package net.diogobohm.timed.impl.ui.daytasklist;
 
 import com.google.common.base.Optional;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
-import java.util.List;
 import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.mvc.MVCController;
 import net.diogobohm.timed.api.ui.domain.DayTaskList;
@@ -26,6 +26,7 @@ public class DayTaskListController extends MVCController<DayTaskListModel, DayTa
 
     private DayTaskListModel model;
     private DayTaskListView view;
+    private Window owner;
 
     public DayTaskListController() {
         taskListController = new TaskListController(this);
@@ -47,6 +48,11 @@ public class DayTaskListController extends MVCController<DayTaskListModel, DayTa
         }
 
         return view;
+    }
+
+    public void setOwner(Window owner) {
+        this.owner = owner;
+        taskListController.setOwner(owner);
     }
 
     public void setDomain(DayTaskList dayTaskList) {
@@ -79,7 +85,7 @@ public class DayTaskListController extends MVCController<DayTaskListModel, DayTa
             public void actionPerformed(ActionEvent e) {
                 Date date = model.getDay();
                 
-                TaskEditController editor = new TaskEditController(caller);
+                TaskEditController editor = new TaskEditController(caller, owner);
                 editor.newTask(date);
             }
         };

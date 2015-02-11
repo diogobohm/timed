@@ -4,9 +4,12 @@
 package net.diogobohm.timed.impl.ui.overviewwindow;
 
 import com.jgoodies.binding.adapter.Bindings;
+import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import net.diogobohm.timed.api.ui.image.ImageLoader;
+import net.diogobohm.timed.api.ui.image.ImageResource;
 import net.diogobohm.timed.impl.ui.daytasklist.DayTaskListController;
 
 /**
@@ -25,10 +28,15 @@ public class OverviewWindowView extends javax.swing.JFrame {
         this.model = model;
         this.filterAction = filterAction;
 
+        setIconImage(getWindowIcon());
         initComponents();
 
         this.model.getTaskListsHolder().addPropertyChangeListener(createTaskListChangeAction());
         updateTaskList();
+    }
+
+    private Image getWindowIcon() {
+        return ImageLoader.getInstance().getIcon(ImageResource.ICON_WINDOW).getImage();
     }
 
     /**
@@ -49,6 +57,7 @@ public class OverviewWindowView extends javax.swing.JFrame {
         dayTaskListContainerPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("TimeD - Overview");
         setMinimumSize(new java.awt.Dimension(600, 600));
         setPreferredSize(new java.awt.Dimension(600, 600));
 

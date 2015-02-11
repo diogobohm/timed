@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import java.io.File;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.UIManager;
 import net.diogobohm.timed.api.db.access.Database;
 import net.diogobohm.timed.api.db.access.DatabaseConnection;

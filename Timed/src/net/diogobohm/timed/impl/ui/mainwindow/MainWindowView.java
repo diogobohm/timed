@@ -4,7 +4,11 @@
 package net.diogobohm.timed.impl.ui.mainwindow;
 
 import com.jgoodies.binding.adapter.Bindings;
+import java.awt.Image;
 import java.awt.event.ActionListener;
+import javax.swing.Icon;
+import net.diogobohm.timed.api.ui.image.ImageLoader;
+import net.diogobohm.timed.api.ui.image.ImageResource;
 import net.diogobohm.timed.api.ui.mvc.MVCView;
 import net.diogobohm.timed.impl.ui.tasklist.TaskListPanel;
 
@@ -29,7 +33,12 @@ public class MainWindowView extends javax.swing.JFrame implements MVCView {
         this.newTaskAction = newTaskAction;
         this.showOverviewAction = showOverviewAction;
 
+        setIconImage(getWindowIcon());
         initComponents();
+    }
+
+    private Image getWindowIcon() {
+        return ImageLoader.getInstance().getIcon(ImageResource.ICON_WINDOW).getImage();
     }
 
     /**

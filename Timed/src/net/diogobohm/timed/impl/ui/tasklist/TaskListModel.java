@@ -4,6 +4,7 @@
 package net.diogobohm.timed.impl.ui.tasklist;
 
 import com.google.common.collect.Lists;
+import java.awt.Window;
 import java.util.List;
 import net.diogobohm.timed.api.domain.Task;
 import net.diogobohm.timed.api.ui.domain.TaskList;
@@ -21,6 +22,8 @@ public class TaskListModel implements MVCModel<TaskList> {
 
     private final TaskItemControllerFactory itemFactory;
     private final TypedValueModel<List<TaskItemController>> taskItemListHolder;
+
+    private Window owner;
 
     public TaskListModel(TaskItemControllerFactory itemFactory) {
         this.itemFactory = itemFactory;
@@ -41,9 +44,13 @@ public class TaskListModel implements MVCModel<TaskList> {
     @Override
     public void setDomainBean(TaskList domainBean) {
         List<Task> tasks = domainBean.getTasks();
-        List<TaskItemController> controllers = itemFactory.createTaskItemControllers(tasks);
+        List<TaskItemController> controllers = itemFactory.createTaskItemControllers(tasks, owner);
         
         getTaskItemListHolder().setValue(controllers);
+    }
+
+    public void setOwner(Window owner) {
+        this.owner = owner;
     }
 
     private List<Task> extractTasks(List<TaskItemController> controllers) {

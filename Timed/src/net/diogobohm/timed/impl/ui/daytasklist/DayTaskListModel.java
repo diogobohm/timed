@@ -24,21 +24,19 @@ public class DayTaskListModel implements MVCModel<DayTaskList> {
     private static final FastDateFormat DATE_NAME_FORMATTER = FastDateFormat.getInstance("EEEE, MMMM d, yyyy");
 
     private final NewTypedValueModel<DayTaskList> currentDayHolder;
-    private final NewTypedValueModel<Boolean> expandHolder;
-    private final NewTypedValueModel<ImageResource> expandLabelHolder;
+    private final NewTypedValueModel<Boolean> expandedHolder;
+    private final NewTypedValueModel<ImageResource> expandIconHolder;
     private final NewTypedValueModel<String> dayWorkedTimeHolder;
     private final NewTypedValueModel<String> dateNameHolder;
     private final NewTypedValueModel<Date> dateHolder;
     
     public DayTaskListModel() {
         currentDayHolder = new NewTypedValueModel();
-        expandHolder = new NewTypedValueModel(Boolean.TRUE);
-        expandLabelHolder = new NewTypedValueModel(ImageResource.ICON_COLLAPSE);
+        expandedHolder = new NewTypedValueModel(Boolean.FALSE);
+        expandIconHolder = new NewTypedValueModel(ImageResource.ICON_EXPAND);
         dayWorkedTimeHolder = new NewTypedValueModel();
         dateNameHolder = new NewTypedValueModel();
         dateHolder = new NewTypedValueModel();
-
-        expandHolder.addPropertyChangeListener(createExpandChangeListener());
     }
 
     @Override
@@ -55,19 +53,20 @@ public class DayTaskListModel implements MVCModel<DayTaskList> {
         getDateHolder().setTypedValue(dayTaskList.getDate());
         getDateNameHolder().setTypedValue(DATE_NAME_FORMATTER.format(dayTaskList.getDate()));
         getDayWorkedTimeHolder().setTypedValue(Task.convertWorkedTimeToString(taskList.getWorkedTime()));
-        getExpandHolder().setTypedValue(!taskList.getTasks().isEmpty());
+
+        setExpanded(!taskList.getTasks().isEmpty());
     }
 
     protected NewTypedValueModel<DayTaskList> getCurrentDayHolder() {
         return currentDayHolder;
     }
 
-    protected NewTypedValueModel<Boolean> getExpandHolder() {
-        return expandHolder;
+    protected NewTypedValueModel<Boolean> getExpandedHolder() {
+        return expandedHolder;
     }
 
-    protected NewTypedValueModel<ImageResource> getExpandLabelHolder() {
-        return expandLabelHolder;
+    protected NewTypedValueModel<ImageResource> getExpandIconHolder() {
+        return expandIconHolder;
     }
 
     protected NewTypedValueModel<String> getDayWorkedTimeHolder() {
@@ -83,27 +82,15 @@ public class DayTaskListModel implements MVCModel<DayTaskList> {
     }
 
     protected void toggleExpand() {
-        getExpandHolder().setTypedValue(!getExpandHolder().booleanValue());
+        setExpanded(!getExpandedHolder().booleanValue());
     }
 
     protected Date getDay() {
         return getDateHolder().getValue();
     }
 
-    private PropertyChangeListener createExpandChangeListener() {
-        return new PropertyChangeListener() {
-
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                ImageResource newImage = ImageResource.ICON_EXPAND;
-
-                if (getExpandHolder().booleanValue()) {
-                    newImage = ImageResource.ICON_EXPAND;
-                }
-
-                getExpandLabelHolder().setTypedValue(newImage);
-            }
-        };
+    private void setExpanded(boolean expanded) {
+        getExpandedHolder().setTypedValue(expanded);
+        getExpandIconHolder().setTypedValue(expanded ? ImageResource.ICON_COLLAPSE : ImageResource.ICON_EXPAND);
     }
-
 }

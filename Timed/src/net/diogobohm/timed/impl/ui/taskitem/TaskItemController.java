@@ -4,6 +4,7 @@
 package net.diogobohm.timed.impl.ui.taskitem;
 
 import com.google.common.base.Optional;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import net.diogobohm.timed.api.db.access.Database;
@@ -22,12 +23,14 @@ import net.diogobohm.timed.impl.ui.taskedit.TaskEditController;
 public class TaskItemController extends MVCController<TaskItemModel, TaskItemPanel> implements DomainEditor<Task> {
 
     private final DomainEditor<Task> dashboardEditor;
+    private final Window owner;
 
     private TaskItemModel model;
     private TaskItemPanel view;
 
-    public TaskItemController(DomainEditor<Task> dashboardEditor) {
+    public TaskItemController(DomainEditor<Task> dashboardEditor, Window owner) {
         this.dashboardEditor = dashboardEditor;
+        this.owner = owner;
     }
 
     public void setTask(Task task) {
@@ -84,8 +87,8 @@ public class TaskItemController extends MVCController<TaskItemModel, TaskItemPan
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                TaskEditController editor = new TaskEditController(caller);
-                editor.editTask(model.getDomainBean());
+                TaskEditController editor = new TaskEditController(caller, owner);
+                editor.editTask(getModel().getDomainBean());
             }
         };
     }

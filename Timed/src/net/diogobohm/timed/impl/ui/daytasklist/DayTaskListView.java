@@ -31,7 +31,10 @@ public class DayTaskListView extends javax.swing.JPanel {
 
         initComponents();
 
-        this.model.getExpandHolder().addPropertyChangeListener(createExpandChangeListener());
+        this.model.getExpandedHolder().addPropertyChangeListener(createExpandChangeListener());
+        this.model.getExpandIconHolder().addPropertyChangeListener(createExpandIconChangeListener());
+
+        refreshExpandIcon();
         refreshTaskList();
     }
 
@@ -127,7 +130,7 @@ public class DayTaskListView extends javax.swing.JPanel {
     }
 
     private void refreshTaskList() {
-        boolean expand = model.getExpandHolder().booleanValue();
+        boolean expand = model.getExpandedHolder().booleanValue();
         
         remove(taskListPanel);
 
@@ -135,16 +138,25 @@ public class DayTaskListView extends javax.swing.JPanel {
             add(taskListPanel);
         }
 
-        refreshExpandIcon();
-
         revalidate();
         repaint();
     }
 
     private void refreshExpandIcon() {
-        ImageResource resource = model.getExpandLabelHolder().getValue();
+        ImageResource resource = model.getExpandIconHolder().getValue();
         ImageIcon icon = ImageLoader.getInstance().getIcon(resource);
 
         toggleExpandLabel.setIcon(icon);
+        toggleExpandLabel.repaint();
+    }
+
+    private PropertyChangeListener createExpandIconChangeListener() {
+        return new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshExpandIcon();
+            }
+        };
     }
 }

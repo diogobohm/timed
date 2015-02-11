@@ -13,6 +13,8 @@ import net.diogobohm.timed.api.domain.Activity;
 import net.diogobohm.timed.api.domain.Project;
 import net.diogobohm.timed.api.domain.Tag;
 import net.diogobohm.timed.api.domain.Task;
+import net.diogobohm.timed.api.ui.domain.validation.ValidationException;
+import net.diogobohm.timed.api.ui.domain.validation.Validator;
 import net.diogobohm.timed.api.ui.mvc.model.LabeledBeanComboBoxModel;
 import net.diogobohm.timed.api.ui.mvc.model.NewTypedValueModel;
 import net.diogobohm.timed.api.ui.mvc.model.TypedComboBoxModel;
@@ -23,9 +25,11 @@ import org.apache.commons.lang3.time.FastDateFormat;
  *
  * @author diogo.bohm
  */
-public class TaskEditModel {
+public class TaskEditModel implements Validator {
 
     private static final FastDateFormat DATETIME_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd HH:mm");
+    private static final FastDateFormat DATE_FORMATTER = FastDateFormat.getInstance("yyyy-MM-dd");
+    private static final FastDateFormat TIME_FORMATTER = FastDateFormat.getInstance("HH:mm");
 
     private final NewTypedValueModel<Optional<Task>> originalTaskHolder;
     private final TypedComboBoxModel<String> activityHolder;
@@ -86,6 +90,56 @@ public class TaskEditModel {
         getProjectHolder().resetElementList(buildLabels(projects));
 
         setDefaultData(initialDate);
+    }
+
+    @Override
+    public void validate() throws ValidationException {
+        String activityName = (String) getActivityHolder().getSelectedItem();
+        String projectName = (String) getProjectHolder().getSelectedItem();
+        String startDate = getStartDateTextHolder().getValue();
+        String startTime = getStartTimeTextHolder().getValue();
+        String stopTime = getStopTimeTextHolder().getValue();
+        Boolean inCourse = getTaskInCourseHolder().getValue();
+
+        if (activityName.isEmpty()) {
+            throw new ValidationException("An activity must be specified!");
+        }
+
+        if (projectName.isEmpty()) {
+            throw new ValidationException("A project must be specified!");
+        }
+
+        if (startDate.isEmpty()) {
+            throw new ValidationException("A date must be specified!");
+        } else {
+            try {
+                DATE_FORMATTER.parse(startDate);
+            } catch (ParseException exception) {
+                throw new ValidationException("A valid date must be provided!");
+            }
+        }
+
+        if (startTime.isEmpty()) {
+            throw new ValidationException("The start time must be specified!");
+        } else {
+            try {
+                TIME_FORMATTER.parse(startTime);
+            } catch (ParseException exception) {
+                throw new ValidationException("A valid start time must be provided!");
+            }
+        }
+
+        if (!inCourse) {
+            if (stopTime.isEmpty()) {
+                throw new ValidationException("The end time must be specified when not in progress!");
+            } else {
+                try {
+                    TIME_FORMATTER.parse(stopTime);
+                } catch (ParseException exception) {
+                    throw new ValidationException("A valid end time must be provided!");
+                }
+            }
+        }
     }
 
     protected TypedComboBoxModel<String> getActivityHolder() {
