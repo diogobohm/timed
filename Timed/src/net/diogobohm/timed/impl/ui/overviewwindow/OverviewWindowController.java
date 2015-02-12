@@ -61,7 +61,8 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
     @Override
     protected OverviewWindowView getView() {
         if (view == null) {
-            view = new OverviewWindowView(getModel(), createFilterAction());
+            view = new OverviewWindowView(getModel(), createFilterAction(), createBackPeriodAction(),
+                    createForwardPeriodAction());
         }
 
         return view;
@@ -82,12 +83,54 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
         };
     }
 
+    private ActionListener createBackPeriodAction() {
+        return new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Date curStartDate = getModel().getStartDate();
+                Date curEndDate = getModel().getEndDate();
+
+                Date newEndDate = DateUtils.addDays(curStartDate, -1);
+                Date newStartDate = new Date(newEndDate.getTime() - (curEndDate.getTime() - curStartDate.getTime()));
+
+                Overview overview = fetchOverviewFor(newStartDate, newEndDate);
+                getModel().setDomainBean(getView(), overview);
+                getModel().setDates(newStartDate, newEndDate);
+            }
+        };
+    }
+
+    private ActionListener createForwardPeriodAction() {
+        return new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Date today = new Date();
+                Date curStartDate = getModel().getStartDate();
+                Date curEndDate = getModel().getEndDate();
+
+                Date newStartDate = DateUtils.addDays(curEndDate, 1);
+                Date newEndDate = new Date(newStartDate.getTime() + (curEndDate.getTime() - curStartDate.getTime()));
+
+                if (newStartDate.after(today)) {
+                    return;
+                }
+
+                Overview overview = fetchOverviewFor(newStartDate, newEndDate);
+                getModel().setDomainBean(getView(), overview);
+                getModel().setDates(newStartDate, newEndDate);
+            }
+        };
+    }
+
     private Overview fetchDefaultOverview() {
         Date today = new Date();
         Date lastSunday = getLastSunday(today);
-        Overview overview = fetchOverviewFor(lastSunday, today);
+        Date nextSaturday = getNextSaturday(today);
+        Overview overview = fetchOverviewFor(lastSunday, nextSaturday);
 
-        getModel().setDates(lastSunday, today);
+        getModel().setDates(lastSunday, nextSaturday);
 
         return overview;
     }
@@ -100,7 +143,6 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
 
     @Override
     public void updateDomain(Optional<Overview> oldValue, Optional<Overview> newValue) {
-        
     }
 
     private Date getLastSunday(Date start) {
@@ -109,6 +151,17 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
 
         while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
             calendar.setTime(DateUtils.addDays(calendar.getTime(), -1));
+        }
+
+        return calendar.getTime();
+    }
+
+    private Date getNextSaturday(Date start) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+
+        while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
+            calendar.setTime(DateUtils.addDays(calendar.getTime(), 1));
         }
 
         return calendar.getTime();
@@ -130,4 +183,5 @@ public class OverviewWindowController extends MVCController<OverviewWindowModel,
 
         return tasks;
     }
+
 }

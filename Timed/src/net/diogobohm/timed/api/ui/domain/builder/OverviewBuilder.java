@@ -21,10 +21,11 @@ import org.joda.time.LocalDate;
 public class OverviewBuilder {
 
     public Overview build(Date startDate, Date endDate, List<Task> tasks) {
+        Date safeEndDate = getSafeEndDate(endDate);
         List<DayTaskList> dayTasks = Lists.newArrayList();
         Multimap<LocalDate, Task> dayTaskMap = createDayTaskMap(tasks);
         LocalDate startDay = LocalDate.fromDateFields(startDate);
-        LocalDate endDay = LocalDate.fromDateFields(endDate);
+        LocalDate endDay = LocalDate.fromDateFields(safeEndDate);
 
         for (LocalDate curDay = startDay; !curDay.isAfter(endDay); curDay = curDay.plusDays(1)) {
             List<Task> curDayTasks = Lists.newArrayList();
@@ -49,5 +50,15 @@ public class OverviewBuilder {
         }
 
         return dayTaskIndex;
+    }
+
+    private Date getSafeEndDate(Date endDate) {
+        Date now = new Date();
+
+        if (endDate.after(now)) {
+            return now;
+        }
+
+        return endDate;
     }
 }

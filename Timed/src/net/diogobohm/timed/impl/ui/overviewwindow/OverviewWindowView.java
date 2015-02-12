@@ -20,13 +20,18 @@ public class OverviewWindowView extends javax.swing.JFrame {
 
     private final OverviewWindowModel model;
     private final ActionListener filterAction;
+    private final ActionListener backAction;
+    private final ActionListener forwardAction;
 
     /**
      * Creates new form OverviewWindowView
      */
-    public OverviewWindowView(OverviewWindowModel model, ActionListener filterAction) {
+    public OverviewWindowView(OverviewWindowModel model, ActionListener filterAction, ActionListener backAction,
+            ActionListener forwardAction) {
         this.model = model;
         this.filterAction = filterAction;
+        this.backAction = backAction;
+        this.forwardAction = forwardAction;
 
         setIconImage(getWindowIcon());
         initComponents();
@@ -48,11 +53,16 @@ public class OverviewWindowView extends javax.swing.JFrame {
     private void initComponents() {
 
         headerPanel = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jumpBackButton = new javax.swing.JButton();
+        jumpFrontButton = new javax.swing.JButton();
+        jumpLabel = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         startDayLabel = new javax.swing.JLabel();
-        startDayFilterField = new javax.swing.JTextField();
-        endDayLabel = new javax.swing.JLabel();
-        endDayFilterField = new javax.swing.JTextField();
         filterButton = new javax.swing.JButton();
+        endDayFilterField = new javax.swing.JTextField();
+        endDayLabel = new javax.swing.JLabel();
+        startDayFilterField = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         dayTaskListContainerPanel = new javax.swing.JPanel();
 
@@ -61,16 +71,47 @@ public class OverviewWindowView extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(600, 600));
         setPreferredSize(new java.awt.Dimension(600, 600));
 
+        jumpBackButton.setText("<-");
+        jumpBackButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jumpBackButtonActionPerformed(evt);
+            }
+        });
+
+        jumpFrontButton.setText("->");
+        jumpFrontButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jumpFrontButtonActionPerformed(evt);
+            }
+        });
+
+        jumpLabel.setText("Jump");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jumpBackButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jumpLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jumpFrontButton)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jumpBackButton)
+                    .addComponent(jumpFrontButton)
+                    .addComponent(jumpLabel))
+                .addContainerGap())
+        );
+
         startDayLabel.setText("From");
-
-        startDayFilterField.setText("startDayFilter");
-        Bindings.bind(startDayFilterField, model.getStartDateHolder());
-
-        endDayLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        endDayLabel.setText("to");
-
-        endDayFilterField.setText("endDayFilter");
-        Bindings.bind(endDayFilterField, model.getEndDateHolder());
 
         filterButton.setText("Filter");
         filterButton.addActionListener(new java.awt.event.ActionListener() {
@@ -79,34 +120,65 @@ public class OverviewWindowView extends javax.swing.JFrame {
             }
         });
 
+        endDayFilterField.setText("endDayFilter");
+        Bindings.bind(endDayFilterField, model.getEndDateHolder());
+
+        endDayLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        endDayLabel.setText("to");
+
+        startDayFilterField.setText("startDayFilter");
+        Bindings.bind(startDayFilterField, model.getStartDateHolder());
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(startDayLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(startDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(endDayLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(endDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(filterButton)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(startDayLabel)
+                    .addComponent(startDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(endDayLabel)
+                    .addComponent(endDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filterButton))
+                .addGap(32, 32, 32))
+        );
+
         javax.swing.GroupLayout headerPanelLayout = new javax.swing.GroupLayout(headerPanel);
         headerPanel.setLayout(headerPanelLayout);
         headerPanelLayout.setHorizontalGroup(
             headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(headerPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(startDayLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(startDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(endDayLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(endDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(filterButton, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         headerPanelLayout.setVerticalGroup(
             headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(headerPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(headerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(startDayLabel)
-                    .addComponent(startDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(endDayLabel)
-                    .addComponent(endDayFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(filterButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(2, 2, 2)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2))
+            .addGroup(headerPanelLayout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2))
         );
 
         getContentPane().add(headerPanel, java.awt.BorderLayout.NORTH);
@@ -128,13 +200,26 @@ public class OverviewWindowView extends javax.swing.JFrame {
         filterAction.actionPerformed(evt);
     }//GEN-LAST:event_filterButtonActionPerformed
 
+    private void jumpFrontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpFrontButtonActionPerformed
+        forwardAction.actionPerformed(evt);
+    }//GEN-LAST:event_jumpFrontButtonActionPerformed
+
+    private void jumpBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpBackButtonActionPerformed
+        backAction.actionPerformed(evt);
+    }//GEN-LAST:event_jumpBackButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel dayTaskListContainerPanel;
     private javax.swing.JTextField endDayFilterField;
     private javax.swing.JLabel endDayLabel;
     private javax.swing.JButton filterButton;
     private javax.swing.JPanel headerPanel;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JButton jumpBackButton;
+    private javax.swing.JButton jumpFrontButton;
+    private javax.swing.JLabel jumpLabel;
     private javax.swing.JTextField startDayFilterField;
     private javax.swing.JLabel startDayLabel;
     // End of variables declaration//GEN-END:variables
